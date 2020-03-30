@@ -1,0 +1,15 @@
+server:
+  port: 8081
+
+spring:
+  profiles:
+    active: dev
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/auth-db
+
+security:
+  token:
+    secret-key: "KuHLb3w7YE2WF@o39ds3hDSdsdfdKhs5kdsdsKH@fD"
+    expires-in: 3600000
+    token-type: "bearer"
