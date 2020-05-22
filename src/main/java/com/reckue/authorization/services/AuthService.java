@@ -1,6 +1,6 @@
 package com.reckue.authorization.services;
 
-import com.reckue.authorization.configurations.filters.TokenProvider;
+import com.reckue.authorization.configs.filters.TokenProvider;
 import com.reckue.authorization.exceptions.AuthenticationException;
 import com.reckue.authorization.exceptions.NotFoundException;
 import com.reckue.authorization.models.entities.Role;

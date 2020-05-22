@@ -1,6 +1,6 @@
-package com.reckue.authorization.configurations;
+package com.reckue.authorization.configs;
 
-import com.reckue.authorization.configurations.filters.TokenProvider;
+import com.reckue.authorization.configs.filters.TokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
