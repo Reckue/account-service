@@ -1,4 +1,4 @@
-package com.reckue.authorization.configurations.filters;
+package com.reckue.authorization.configs.filters;
 
 import com.reckue.authorization.exceptions.AuthenticationException;
 import com.reckue.authorization.models.entities.Role;

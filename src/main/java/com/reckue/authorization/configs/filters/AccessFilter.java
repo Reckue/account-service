@@ -1,4 +1,4 @@
-package com.reckue.authorization.configurations.filters;
+package com.reckue.authorization.configs.filters;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.reckue.authorization.exceptions.AuthenticationException;

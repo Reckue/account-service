@@ -1,7 +1,7 @@
-package com.reckue.authorization.configurations;
+package com.reckue.authorization.configs;
 
-import com.reckue.authorization.configurations.filters.AccessFilter;
-import com.reckue.authorization.configurations.filters.TokenProvider;
+import com.reckue.authorization.configs.filters.AccessFilter;
+import com.reckue.authorization.configs.filters.TokenProvider;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.config.annotation.SecurityConfigurerAdapter;

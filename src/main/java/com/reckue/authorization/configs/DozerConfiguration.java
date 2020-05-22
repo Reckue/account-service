@@ -1,4 +1,4 @@
-package com.reckue.authorization.configurations;
+package com.reckue.authorization.configs;
 
 import org.dozer.DozerBeanMapper;
 import org.springframework.context.annotation.Bean;
