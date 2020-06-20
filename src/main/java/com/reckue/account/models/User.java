@@ -10,6 +10,11 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.sql.Timestamp;
 import java.util.Set;
 
+/**
+ * Class User represents the POJO-object and the main entity of the application.
+ *
+ * @author Kamila Meshcheryakova
+ */
 @Data
 @SuperBuilder
 @AllArgsConstructor

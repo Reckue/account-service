@@ -1,10 +1,10 @@
 package com.reckue.account.controllers;
 
-import com.reckue.account.transfers.UserTransfer;
 import com.reckue.account.services.UserService;
+import com.reckue.account.transfers.UserTransfer;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dozer.Mapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -12,20 +12,30 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Class UserСontroller represents a REST-Controller with get and delete operations connecting with users.
+ *
+ * @author Kamila Meshcheryakova
+ */
 @Slf4j
 @RestController
 @RequestMapping("/users")
+@RequiredArgsConstructor
 public class UserController {
 
     private final Mapper mapper;
     private final UserService userService;
 
-    @Autowired
-    public UserController(Mapper mapper, UserService userService) {
-        this.mapper = mapper;
-        this.userService = userService;
-    }
-
+    /**
+     * This type of request allows to get all the users that meet the requirements.
+     *
+     * @param limit  quantity of objects
+     * @param offset quantity to skip
+     * @param sort   parameter for sorting
+     * @param desc   sorting descending
+     * @return list of given quantity of objects of class UserTransfer with a given offset
+     * sorted by the selected parameter for sorting in descending order
+     */
     @GetMapping
     @ResponseStatus(code = HttpStatus.OK)
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
@@ -40,18 +50,35 @@ public class UserController {
         return users;
     }
 
+    /**
+     * This type of request allows to get the user by id.
+     *
+     * @param id the object identifier
+     * @return the object of class UserTransfer
+     */
     @GetMapping("/{id}")
     @ResponseStatus(code = HttpStatus.OK)
     public UserTransfer getById(@PathVariable String id) {
         return mapper.map(userService.findById(id), UserTransfer.class);
     }
 
+    /**
+     * This type of request allows to get the user by name.
+     *
+     * @param username the object name
+     * @return the object of class UserTransfer
+     */
     @GetMapping("/username/{username}")
     @ResponseStatus(code = HttpStatus.OK)
     public UserTransfer getByUsername(@PathVariable String username) {
         return mapper.map(userService.findByUsername(username), UserTransfer.class);
     }
 
+    /**
+     * This type of request allows to delete the user by id.
+     *
+     * @param id the object identifier
+     */
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @ResponseStatus(code = HttpStatus.OK)
@@ -59,6 +86,11 @@ public class UserController {
         userService.deleteById(id);
     }
 
+    /**
+     * This type of request allows to delete the user by name.
+     *
+     * @param username the object name
+     */
     @DeleteMapping("/username/{username}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @ResponseStatus(code = HttpStatus.OK)

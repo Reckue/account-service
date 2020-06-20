@@ -6,10 +6,10 @@ import com.reckue.account.exceptions.NotFoundException;
 import com.reckue.account.models.Role;
 import com.reckue.account.models.Status;
 import com.reckue.account.models.User;
+import com.reckue.account.repositories.UserRepository;
+import com.reckue.account.transfers.AuthTransfer;
 import com.reckue.account.transfers.LoginRequest;
 import com.reckue.account.transfers.RegisterRequest;
-import com.reckue.account.transfers.AuthTransfer;
-import com.reckue.account.repositories.UserRepository;
 import com.reckue.account.utils.helpers.RandomHelper;
 import com.reckue.account.utils.helpers.TimestampHelper;
 import lombok.AllArgsConstructor;
@@ -24,6 +24,11 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.HashSet;
 import java.util.Optional;
 
+/**
+ * Class AuthService represents service with operations related to authentication and authorization.
+ *
+ * @author Kamila Meshcheryakova
+ */
 @Service
 @Transactional
 @AllArgsConstructor
@@ -34,9 +39,16 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
 
+    /**
+     * This method is used to register a new user.
+     * Throws {@link AuthenticationException} in case if user with such username already exists.
+     *
+     * @param registerForm with required fields
+     * @return the object of class AuthTransfer
+     */
     public AuthTransfer register(RegisterRequest registerForm) {
         // checking that the user exists in the database
-        if (userRepository.existsByUsername(registerForm.getUsername())) {
+        if (!userRepository.existsByUsername(registerForm.getUsername())) {
 
             // create a new refresh token
             String refreshToken = tokenProvider.createRefreshToken();
@@ -73,6 +85,14 @@ public class AuthService {
         }
     }
 
+    /**
+     * This method is used an authorized user to log in.
+     * Throws {@link NotFoundException} in case if such user isn't contained in database.
+     * Throws {@link AuthenticationException} in case if user enters invalid username or password.
+     *
+     * @param loginForm with required fields
+     * @return the object of class AuthTransfer
+     */
     public AuthTransfer login(LoginRequest loginForm) {
         try {
             // find user from database
@@ -108,6 +128,13 @@ public class AuthService {
         }
     }
 
+    /**
+     * This method is used to get the user by his token.
+     * Throws {@link NotFoundException} in case if such user isn't contained in database.
+     *
+     * @param request information for HTTP servlets
+     * @return the object of class UserTransfer
+     */
     public User getCurrentUser(HttpServletRequest request) {
         // get username from jwt token
         String username = tokenProvider.getUsernameByToken(tokenProvider.extractToken(request));
@@ -123,6 +150,14 @@ public class AuthService {
         return user;
     }
 
+    /**
+     * This method is used to update the token of an authorized user.
+     * Throws {@link AuthenticationException} in case if an invalid refresh token is entered.
+     *
+     * @param username     name of user
+     * @param refreshToken token of an authorized user
+     * @return the object of class AuthTransfer
+     */
     public AuthTransfer refresh(String username, String refreshToken) {
         // get instance of user model by username from database
         Optional<User> userModel = userRepository.findByUsername(username);
