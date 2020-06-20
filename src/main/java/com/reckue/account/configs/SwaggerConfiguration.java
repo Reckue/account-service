@@ -2,7 +2,6 @@ package com.reckue.account.configs;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.RequestHandlerSelectors;
@@ -20,16 +19,6 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @Configuration
 @EnableSwagger2
 public class SwaggerConfiguration implements WebMvcConfigurer {
-
-    /**
-     * This method redirects users from home page to the Swagger UI page.
-     *
-     * @param registry assists with the registration of simple automated controllers pre-configured
-     */
-    @Override
-    public void addViewControllers(ViewControllerRegistry registry) {
-        registry.addRedirectViewController("/swagger", "/swagger-ui.html");
-    }
 
     /**
      * This method creates a customised Docket bean.
