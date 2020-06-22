@@ -1,7 +1,7 @@
 package com.reckue.account.configs;
 
 import com.reckue.account.configs.filters.TokenProvider;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -17,18 +17,25 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+/**
+ * Class WebSecurityConfiguration sets the settings for web security.
+ *
+ * @author Kamila Meshcheryakova
+ */
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     private final TokenProvider tokenProvider;
 
-    @Autowired
-    public WebSecurityConfiguration(TokenProvider tokenProvider) {
-        this.tokenProvider = tokenProvider;
-    }
-
+    /**
+     * This method is used to configure the access for authorised and unauthorised users.
+     *
+     * @param http web based security for specific http requests
+     * @throws Exception all kind of checked exceptions
+     */
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 
@@ -62,6 +69,11 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         // http.httpBasic();
     }
 
+    /**
+     * This method is used to configure the access to swagger without authentication.
+     *
+     * @param web an instance of web security
+     */
     @Override
     public void configure(WebSecurity web) {
         // Allow swagger to be accessed without authentication
@@ -78,6 +90,11 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers("/h2-console/**/**");
     }
 
+    /**
+     * This method is used to provide an instance based on the provided request.
+     *
+     * @return an object of UrlBasedCorsConfigurationSource class
+     */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
@@ -85,11 +102,22 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         return source;
     }
 
+    /**
+     * This method is used to encode the password.
+     *
+     * @return an encoded password
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(12);
     }
 
+    /**
+     * This method is used to expose the {@link AuthenticationManager} as a Bean.
+     *
+     * @return an object of AuthenticationManager class
+     * @throws Exception all kind of checked exceptions
+     */
     @Override
     @Bean
     public AuthenticationManager authenticationManagerBean() throws Exception {

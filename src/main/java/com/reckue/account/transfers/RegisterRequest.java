@@ -4,6 +4,11 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Class RegisterRequest represents an incoming DTO for a user to register.
+ *
+ * @author Kamila Meshcheryakova
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

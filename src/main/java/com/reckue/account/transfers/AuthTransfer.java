@@ -6,6 +6,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Class AuthTransfer represents an outgoing DTO to receive a user token.
+ *
+ * @author Kamila Meshcheryakova
+ */
 @Data
 @Builder
 @NoArgsConstructor

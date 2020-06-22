@@ -25,18 +25,23 @@ import java.util.Date;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Component
+/**
+ * Class TokenProvider provides a token.
+ *
+ * @author Kamila Meshcheryakova
+ */
 @Slf4j
+@Component
 public class TokenProvider {
 
     @Value("${security.token.secret:secret-key}")
     private String secretKey;
 
     @Value("${security.token.expires-in:3600000}")
-    private long expire = 3600000;
+    private final long expire = 3600000;
 
     @Value("${security.token.token-type:bearer}")
-    private String tokenType = "bearer";
+    private final String tokenType = "bearer";
 
     private final UserDetailsService userDetailsService;
 
@@ -45,11 +50,21 @@ public class TokenProvider {
         this.userDetailsService = userDetailsService;
     }
 
+    /**
+     * This method is used to init a secretKey using the encoder.
+     */
     @PostConstruct
     protected void init() {
         secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
     }
 
+    /**
+     * This method is used to create access token.
+     *
+     * @param username the name of user
+     * @param roles    list of user roles
+     * @return a token
+     */
     public String createAccessToken(String username, Set<Role> roles) {
         Claims claims = Jwts.claims().setSubject(username);
         claims.put("auth", roles.stream()
@@ -65,18 +80,39 @@ public class TokenProvider {
                 .compact();
     }
 
+    /**
+     * This method is used to create a refresh token.
+     *
+     * @return refresh token
+     */
     public String createRefreshToken() {
         return RandomHelper.generate();
     }
 
+    /**
+     * This method is used to set token validity.
+     *
+     * @return validity as long type
+     */
     public long getExpire() {
         return new Timestamp(System.currentTimeMillis()).getTime() + expire;
     }
 
+    /**
+     * Getter for token type.
+     *
+     * @return token type as string
+     */
     public String getTokenType() {
         return tokenType;
     }
 
+    /**
+     * This method is used to authenticate user by token.
+     *
+     * @param token the user token
+     * @return a simple presentation of a username and password
+     */
     public Authentication authenticateToken(String token) {
         UserDetails userDetails;
         String username = getUsernameByToken(token);
@@ -88,6 +124,18 @@ public class TokenProvider {
         }
     }
 
+    /**
+     * This method is used to get user name by token.
+     * Throws {@link AuthenticationException} in case:
+     * if a token has expired;
+     * if an invalid token is entered;
+     * if a token is incorrect - a JWT was not correctly constructed and should be rejected;
+     * if a signature or verifying an existing signature of a JWT failed;
+     * if a method has been passed an illegal or inappropriate argument.
+     *
+     * @param token the user token
+     * @return a user name
+     */
     public String getUsernameByToken(String token) {
         try {
             return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getSubject();
@@ -104,6 +152,12 @@ public class TokenProvider {
         }
     }
 
+    /**
+     * This method is used to get token without token type.
+     *
+     * @param req request information for HTTP servlets
+     * @return a token without token type
+     */
     public String extractToken(HttpServletRequest req) {
         String token = req.getHeader("Authorization");
 
@@ -113,6 +167,18 @@ public class TokenProvider {
         return null;
     }
 
+    /**
+     * This method is used to validate token by secret key.
+     * Throws {@link AuthenticationException} in case:
+     * if a token has expired;
+     * if an invalid token is entered;
+     * if a token is incorrect - a JWT was not correctly constructed and should be rejected;
+     * if a signature or verifying an existing signature of a JWT failed;
+     * if a method has been passed an illegal or inappropriate argument.
+     *
+     * @param token the user token
+     * @return true or false
+     */
     public boolean validateToken(String token) {
         try {
             Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);

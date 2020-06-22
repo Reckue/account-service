@@ -4,6 +4,11 @@ import lombok.Data;
 
 import java.util.Map;
 
+/**
+ * Class ErrorTransfer allows to convert a response to a given response when it throws an exception.
+ *
+ * @author Kamila Meshcheryakova
+ */
 @Data
 public class ErrorTransfer {
 
