@@ -1,5 +1,6 @@
 package com.reckue.account.controllers;
 
+import com.reckue.account.controllers.apis.AuthApi;
 import com.reckue.account.services.AuthService;
 import com.reckue.account.transfers.AuthTransfer;
 import com.reckue.account.transfers.LoginRequest;
@@ -22,7 +23,9 @@ import javax.servlet.http.HttpServletRequest;
  */
 @RestController
 @RequiredArgsConstructor
-public class AuthController {
+@RequestMapping(value = "/auth")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
+public class AuthController implements AuthApi {
 
     private final Mapper mapper;
     private final AuthService authService;
@@ -34,7 +37,6 @@ public class AuthController {
      * @return the object of class AuthTransfer
      */
     @PostMapping("/register")
-    @ResponseStatus(code = HttpStatus.CREATED)
     public AuthTransfer register(@RequestBody RegisterRequest registerForm) {
         return authService.register(registerForm);
     }

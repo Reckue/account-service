@@ -5,6 +5,7 @@ import com.reckue.account.exceptions.AuthenticationException;
 import com.reckue.account.exceptions.InvalidDataException;
 import com.reckue.account.exceptions.NotFoundException;
 import com.reckue.account.transfers.ErrorTransfer;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -25,7 +26,8 @@ public class CustomExceptionHandler {
      */
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<?> handleAuthenticationException(AuthenticationException e) {
-        return new ResponseEntity<>(new ErrorTransfer(e.getMessage(), e.getHttpStatus().value()), e.getHttpStatus());
+        return new ResponseEntity<>(new ErrorTransfer(e.getMessage(), HttpStatus.UNAUTHORIZED,
+                HttpStatus.UNAUTHORIZED.value()), HttpStatus.UNAUTHORIZED);
     }
 
     /**
@@ -36,7 +38,8 @@ public class CustomExceptionHandler {
      */
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<?> handleNotFoundException(NotFoundException e) {
-        return new ResponseEntity<>(new ErrorTransfer(e.getMessage(), e.getHttpStatus().value()), e.getHttpStatus());
+        return new ResponseEntity<>(new ErrorTransfer(e.getMessage(), HttpStatus.NOT_FOUND,
+                HttpStatus.NOT_FOUND.value()), HttpStatus.NOT_FOUND);
     }
 
     /**
@@ -47,7 +50,8 @@ public class CustomExceptionHandler {
      */
     @ExceptionHandler(AlreadyExistsException.class)
     public ResponseEntity<?> handleAlreadyExistsException(AlreadyExistsException e) {
-        return new ResponseEntity<>(new ErrorTransfer(e.getMessage(), e.getHttpStatus().value()), e.getHttpStatus());
+        return new ResponseEntity<>(new ErrorTransfer(e.getMessage(), HttpStatus.CONFLICT, HttpStatus.CONFLICT.value()),
+                HttpStatus.CONFLICT);
     }
 
     /**
@@ -58,6 +62,7 @@ public class CustomExceptionHandler {
      */
     @ExceptionHandler(InvalidDataException.class)
     public ResponseEntity<?> handleInvalidDataException(InvalidDataException e) {
-        return new ResponseEntity<>(new ErrorTransfer(e.getMessage(), e.getHttpStatus().value()), e.getHttpStatus());
+        return new ResponseEntity<>(new ErrorTransfer(e.getMessage(), HttpStatus.BAD_REQUEST,
+                HttpStatus.BAD_REQUEST.value()), HttpStatus.BAD_REQUEST);
     }
 }

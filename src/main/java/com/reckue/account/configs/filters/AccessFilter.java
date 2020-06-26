@@ -49,7 +49,7 @@ public class AccessFilter extends OncePerRequestFilter {
             }
         } catch (AuthenticationException e) {
             SecurityContextHolder.clearContext();
-            ErrorTransfer responseInfo = new ErrorTransfer(e.getMessage(), e.getHttpStatus().value());
+            ErrorTransfer responseInfo = new ErrorTransfer(e.getMessage(), e.getHttpStatus(), e.getHttpStatus().value());
             httpServletResponse.resetBuffer();
             httpServletResponse.setStatus(e.getHttpStatus().value());
             httpServletResponse.setHeader("Content-Type", "application/json");

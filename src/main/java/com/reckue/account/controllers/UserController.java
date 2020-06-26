@@ -1,11 +1,11 @@
 package com.reckue.account.controllers;
 
+import com.reckue.account.controllers.apis.UserApi;
 import com.reckue.account.services.UserService;
 import com.reckue.account.transfers.UserTransfer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dozer.Mapper;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,7 +21,8 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
-public class UserController {
+@CrossOrigin(origins = "*", allowedHeaders = "*")
+public class UserController implements UserApi {
 
     private final Mapper mapper;
     private final UserService userService;
@@ -37,7 +38,6 @@ public class UserController {
      * sorted by the selected parameter for sorting in descending order
      */
     @GetMapping
-    @ResponseStatus(code = HttpStatus.OK)
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     public List<UserTransfer> getAll(@RequestParam(required = false, defaultValue = "10") int limit,
                                      @RequestParam(required = false, defaultValue = "0") int offset,
@@ -57,7 +57,6 @@ public class UserController {
      * @return the object of class UserTransfer
      */
     @GetMapping("/{id}")
-    @ResponseStatus(code = HttpStatus.OK)
     public UserTransfer getById(@PathVariable String id) {
         return mapper.map(userService.findById(id), UserTransfer.class);
     }
@@ -69,7 +68,6 @@ public class UserController {
      * @return the object of class UserTransfer
      */
     @GetMapping("/username/{username}")
-    @ResponseStatus(code = HttpStatus.OK)
     public UserTransfer getByUsername(@PathVariable String username) {
         return mapper.map(userService.findByUsername(username), UserTransfer.class);
     }
@@ -81,7 +79,6 @@ public class UserController {
      */
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    @ResponseStatus(code = HttpStatus.OK)
     public void deleteById(@PathVariable String id) {
         userService.deleteById(id);
     }
@@ -93,7 +90,6 @@ public class UserController {
      */
     @DeleteMapping("/username/{username}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    @ResponseStatus(code = HttpStatus.OK)
     public void deleteByUsername(@PathVariable String username) {
         userService.deleteByUsername(username);
     }
