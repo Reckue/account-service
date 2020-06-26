@@ -48,7 +48,6 @@ public class AuthController implements AuthApi {
      * @return the object of class AuthTransfer
      */
     @PostMapping("/login")
-    @ResponseStatus(code = HttpStatus.ACCEPTED)
     public AuthTransfer login(@RequestBody LoginRequest loginForm) {
         return authService.login(loginForm);
     }
@@ -60,7 +59,6 @@ public class AuthController implements AuthApi {
      * @return the object of class UserTransfer
      */
     @GetMapping(value = "/current_user")
-    @ResponseStatus(code = HttpStatus.ACCEPTED)
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     public UserTransfer getCurrentUser(HttpServletRequest request) {
         return mapper.map(authService.getCurrentUser(request), UserTransfer.class);
@@ -74,7 +72,6 @@ public class AuthController implements AuthApi {
      * @return the object of class AuthTransfer
      */
     @GetMapping(value = "/refresh_token")
-    @ResponseStatus(code = HttpStatus.CREATED)
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     public AuthTransfer refresh(@RequestParam(name = "refresh_token") String refreshToken,
                                 @AuthenticationPrincipal User user) {
