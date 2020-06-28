@@ -1,0 +1,39 @@
+### Directories ###
+.idea/
+out/
+target/
+gradle/
+build/
+.gradle/
+
+### Files ###
+*.class
+*.iml
+gradlew
+gradlew.bat
+
+.gradle
+/build/
+!gradle/wrapper/gradle-wrapper.jar
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.ipr
+/out/
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
