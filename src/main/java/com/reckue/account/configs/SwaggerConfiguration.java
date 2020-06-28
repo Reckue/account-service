@@ -63,14 +63,7 @@ public class SwaggerConfiguration implements WebMvcConfigurer {
                                 .build()))
                 .useDefaultResponseMessages(false)
                 .additionalModels(typeResolver.resolve(ErrorTransfer.class))
-                .globalResponseMessage(RequestMethod.GET, newArrayList(new ResponseMessageBuilder().code(200)
-                                .message("OK")
-                                .responseModel(new ModelRef("UserTransfer"))
-                                .build(),
-                        new ResponseMessageBuilder().code(201)
-                                .message("CREATED")
-                                .responseModel(new ModelRef("AuthTransfer"))
-                                .build(),
+                .globalResponseMessage(RequestMethod.GET, newArrayList(
                         new ResponseMessageBuilder().code(400)
                                 .message("BAD_REQUEST")
                                 .responseModel(new ModelRef("ErrorTransfer"))

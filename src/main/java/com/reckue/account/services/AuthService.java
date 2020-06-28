@@ -160,16 +160,18 @@ public class AuthService {
      */
     public AuthTransfer refresh(String username, String refreshToken) {
         // get instance of user model by username from database
-        Optional<User> userModel = userRepository.findByUsername(username);
+        User userModel = userRepository.findByUsername(username)
+                .orElseThrow(() -> new NotFoundException("The user by username [" + username + "] not found",
+                        HttpStatus.NOT_FOUND));
 
         // check for equality of refresh tokens
-        if (userModel.isPresent() && userModel.get().getRefreshToken().equals(refreshToken)) {
+        if (userModel.getRefreshToken().equals(refreshToken)) {
 
             // update last visit date
-            userModel.get().setLastVisit(TimestampHelper.getCurrentTimestamp());
+            userModel.setLastVisit(TimestampHelper.getCurrentTimestamp());
 
             return AuthTransfer.builder()
-                    .accessToken(tokenProvider.createAccessToken(username, userModel.get().getRoles()))
+                    .accessToken(tokenProvider.createAccessToken(username, userModel.getRoles()))
                     .refreshToken(tokenProvider.createRefreshToken())
                     .tokenType(tokenProvider.getTokenType())
                     .expiresIn(tokenProvider.getExpire())
