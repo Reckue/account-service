@@ -49,12 +49,10 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
         // Entry points
         http.authorizeRequests()//
-                .antMatchers("/login").permitAll()//
-                .antMatchers("/register").permitAll()//
+                .antMatchers("/auth/login").permitAll()//
+                .antMatchers("/auth/register").permitAll()//
                 .antMatchers("/users/**").permitAll()
                 .antMatchers("/swagger-ui.html").permitAll()
-                .antMatchers("/demo").permitAll()
-                .antMatchers("/h2-console/**/**").permitAll()
 
                 // Disallow everything else..
                 .anyRequest().authenticated();
@@ -82,12 +80,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers("/swagger-ui.html")//
                 .antMatchers("/configuration/**")//
                 .antMatchers("/webjars/**")//
-                .antMatchers("/public")
-
-                // Un-secure H2 Database (for testing purposes, H2 console shouldn't be unprotected in production)
-                .and()
-                .ignoring()
-                .antMatchers("/h2-console/**/**");
+                .antMatchers("/public");
     }
 
     /**
