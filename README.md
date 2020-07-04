@@ -1,5 +1,5 @@
 # account-api
-[![Build Status](https://travis-ci.com/reckue/authorization-service-api.svg?branch=develop)](https://travis-ci.com/reckue/authorization-service-api)
+![deploy](https://github.com/Reckue/account-api/workflows/deploy/badge.svg)
 
 Service for user autorization.
 
@@ -12,7 +12,6 @@ Service for user autorization.
 - MongoDB
 - Lombok
 - Swagger
-- H2database
 - Devtools
 - Apache Commons
 
