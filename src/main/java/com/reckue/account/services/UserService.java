@@ -113,7 +113,7 @@ public class UserService {
         if (!userRepository.existsById(id)) {
             userRepository.deleteById(id);
         } else {
-            throw new NotFoundException("The user by username '" + id + "' not found", HttpStatus.NOT_FOUND);
+            throw new NotFoundException("The user by id '" + id + "' not found", HttpStatus.NOT_FOUND);
         }
     }
 
