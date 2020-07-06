@@ -2,10 +2,7 @@ package com.reckue.account.controllers;
 
 import com.reckue.account.services.UserService;
 import com.reckue.account.transfers.UserTransfer;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dozer.Mapper;
@@ -41,7 +38,7 @@ public class UserController {
      * @return list of given quantity of objects of class UserTransfer with a given offset
      * sorted by the selected parameter for sorting in descending order
      */
-    @ApiOperation(value = "View a list of available users", response = UserTransfer.class)
+    @ApiOperation(value = "View a list of available users", response = UserTransfer.class, authorizations = {@Authorization(value = "JWT")})
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "List of users successfully retrieved"),
             @ApiResponse(code = 400, message = "You need to change the parameters of your request"),
@@ -66,7 +63,7 @@ public class UserController {
      * @param id the object identifier
      * @return the object of class UserTransfer
      */
-    @ApiOperation(value = "Get user by id", response = UserTransfer.class)
+    @ApiOperation(value = "Get user by id", response = UserTransfer.class, authorizations = {@Authorization(value = "JWT")})
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "The user successfully found"),
             @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
@@ -82,7 +79,7 @@ public class UserController {
      * @param username the object name
      * @return the object of class UserTransfer
      */
-    @ApiOperation(value = "Get user by username", response = UserTransfer.class)
+    @ApiOperation(value = "Get user by username", response = UserTransfer.class, authorizations = {@Authorization(value = "JWT")})
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "The user successfully found"),
             @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
@@ -97,7 +94,7 @@ public class UserController {
      *
      * @param id the object identifier
      */
-    @ApiOperation(value = "Delete user by id")
+    @ApiOperation(value = "Delete user by id", authorizations = {@Authorization(value = "JWT")})
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "The user successfully deleted"),
             @ApiResponse(code = 404, message = "The resource you were trying to delete is not found"),
@@ -113,7 +110,7 @@ public class UserController {
      *
      * @param username the object name
      */
-    @ApiOperation(value = "Delete user by username")
+    @ApiOperation(value = "Delete user by username", authorizations = {@Authorization(value = "JWT")})
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "The user successfully deleted"),
             @ApiResponse(code = 404, message = "The resource you were trying to delete is not found"),

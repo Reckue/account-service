@@ -5,10 +5,7 @@ import com.reckue.account.transfers.AuthTransfer;
 import com.reckue.account.transfers.LoginRequest;
 import com.reckue.account.transfers.RegisterRequest;
 import com.reckue.account.transfers.UserTransfer;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.*;
 import lombok.RequiredArgsConstructor;
 import org.dozer.Mapper;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -72,7 +69,8 @@ public class AuthController {
      * @param request information for HTTP servlets
      * @return the object of class UserTransfer
      */
-    @ApiOperation(value = "Get current user", response = UserTransfer.class)
+    @ApiOperation(value = "Get current user", response = UserTransfer.class,
+            authorizations = {@Authorization(value = "JWT")})
     @ApiResponses(value = {
             @ApiResponse(code = 202, message = "The request has accepted"),
             @ApiResponse(code = 400, message = "You need to change the incoming parameters"),
@@ -91,7 +89,8 @@ public class AuthController {
      * @param user         authorized user
      * @return the object of class AuthTransfer
      */
-    @ApiOperation(value = "Updating", response = AuthTransfer.class)
+    @ApiOperation(value = "Updating", response = AuthTransfer.class,
+            authorizations = {@Authorization(value = "JWT")})
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "RefreshToken has updated"),
             @ApiResponse(code = 400, message = "Invalid incoming parameters"),
