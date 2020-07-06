@@ -11,10 +11,13 @@ import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.builders.ResponseMessageBuilder;
 import springfox.documentation.schema.ModelRef;
 import springfox.documentation.service.ApiInfo;
+import springfox.documentation.service.ApiKey;
 import springfox.documentation.service.Contact;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
+
+import java.util.Collections;
 
 import static com.google.common.collect.Lists.newArrayList;
 
@@ -39,6 +42,7 @@ public class SwaggerConfiguration implements WebMvcConfigurer {
                 .apis(RequestHandlerSelectors.basePackage("com.reckue.account.controllers"))
                 .build()
                 .apiInfo(apiInfo())
+                .securitySchemes(Collections.singletonList(apiKey()))
                 .useDefaultResponseMessages(false)
                 .additionalModels(typeResolver.resolve(ErrorTransfer.class))
                 .globalResponseMessage(RequestMethod.POST, newArrayList(new ResponseMessageBuilder().code(201)
@@ -107,5 +111,14 @@ public class SwaggerConfiguration implements WebMvcConfigurer {
                 .description("Provide authorization and authentication")
                 .contact(new Contact("Reckue", "www.reckue.com", "support@reckue.com"))
                 .build();
+    }
+
+    /**
+     * This method allows to add authorize button to swagger configuration.
+     *
+     * @return apiKey with given parameters
+     */
+    private ApiKey apiKey() {
+        return new ApiKey("JWT", "Authorization", "header");
     }
 }
