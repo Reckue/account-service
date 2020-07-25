@@ -7,10 +7,7 @@ spring:
   data:
     mongodb:
       host: mongodb
-      port: 27017
-      database: sampledb
-      username: userX0W
-      password: CbAk3J7f2FTxA6EF
+      database: account-cloud
 
 security:
   token:
@@ -24,10 +21,9 @@ server:
 
 spring:
   profiles: staging
-
-MONGO_URI: mongodb://127.0.0.1
-MONGO_PORT: 27017
-MONGO_DBNAME: mongo-staging
+  data:
+    mongodb:
+      database: account-staging
 
 security:
   token:
@@ -42,10 +38,9 @@ server:
 spring:
   profiles:
     active: develop
-
-MONGO_URI: mongodb://127.0.0.1
-MONGO_PORT: 27017
-MONGO_DBNAME: mongo-develop
+  data:
+    mongodb:
+      database: account-develop
 
 security:
   token:
