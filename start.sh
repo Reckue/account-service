@@ -6,4 +6,4 @@ bash ./config/docker/push_image.sh
 # autodeploy
 oc apply -f ./config/k8s/deployment.yml
 oc apply -f ./config/k8s/service.yml
-oc expose svc/account # create route
+oc apply -f ./config/k8s/route.yml
