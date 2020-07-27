@@ -3,6 +3,8 @@ server:
   port: 8080
 
 spring:
+  application:
+    name: account-api
   profiles: cloud
   data:
     mongodb:
@@ -15,11 +17,18 @@ security:
     expires-in: 3600000
     token-type: "bearer"
 
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+
 --- # staging # ---
 server:
   port: 9001
 
 spring:
+  application:
+    name: account-api
   profiles: staging
   data:
     mongodb:
@@ -36,6 +45,8 @@ server:
   port: 9001
 
 spring:
+  application:
+    name: account-api
   profiles:
     active: develop
   data:

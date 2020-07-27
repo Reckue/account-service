@@ -4,7 +4,7 @@ plugins {
     id 'io.spring.dependency-management' version '1.0.8.RELEASE'
 }
 
-group = 'com.reckure'
+group = 'com.reckue'
 version = '1.0.0.SNAPSHOT'
 sourceCompatibility = '11'
 
@@ -34,6 +34,12 @@ dependencies {
     /* lombok */
     compileOnly 'org.projectlombok:lombok:1.18.4'
     annotationProcessor 'org.projectlombok:lombok:1.18.10'
+
+    /* actuator */
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
+    /* eureka client */
+    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client:2.2.2.RELEASE'
 
     /* test */
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
