@@ -1,3 +1,7 @@
+spring:
+  application:
+    name: account-api
+
 --- # cloud # ---
 server:
   port: 8080
@@ -14,6 +18,11 @@ security:
     secret-key: "KuHLb3w7YE2WF@o39ds3hDSdsdfdKhs5kdsdsKH@fD"
     expires-in: 3600000
     token-type: "bearer"
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://registry-service:8761/eureka
 
 --- # staging # ---
 server:
@@ -47,3 +56,8 @@ security:
     secret-key: "KuHLb3w7YE2WF@o39ds3hDSdsdfdKhs5kdsdsKH@fD"
     expires-in: 3600000
     token-type: "bearer"
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
