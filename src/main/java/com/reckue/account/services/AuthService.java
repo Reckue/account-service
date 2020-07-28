@@ -2,6 +2,7 @@ package com.reckue.account.services;
 
 import com.reckue.account.configs.filters.TokenProvider;
 import com.reckue.account.exceptions.AuthenticationException;
+import com.reckue.account.exceptions.InvalidDataException;
 import com.reckue.account.exceptions.NotFoundException;
 import com.reckue.account.models.Role;
 import com.reckue.account.models.Status;
@@ -22,7 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashSet;
-import java.util.Optional;
 
 /**
  * Class AuthService represents service with operations related to authentication and authorization.
@@ -49,6 +49,18 @@ public class AuthService {
     public AuthTransfer register(RegisterRequest registerForm) {
         // checking that the user exists in the database
         if (!userRepository.existsByUsername(registerForm.getUsername())) {
+
+            // check password verification
+            if (!registerForm.getPassword().matches("(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=\\S+$).{8,}")) {
+                throw new InvalidDataException("Your password must contain at least 8 chars" +
+                        ", one digit" +
+                        ", one lower alpha char and one upper alpha char" +
+                        ", and not contain space, tab, etc.", HttpStatus.BAD_REQUEST);
+            }
+            // check email verification
+            if (!registerForm.getEmail().matches("\\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}\\b")) {
+                throw new InvalidDataException("Please correct, it isn't an email.", HttpStatus.BAD_REQUEST);
+            }
 
             // create a new refresh token
             String refreshToken = tokenProvider.createRefreshToken();

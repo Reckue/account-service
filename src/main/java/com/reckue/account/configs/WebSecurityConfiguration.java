@@ -52,7 +52,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers("/auth/login").permitAll()//
                 .antMatchers("/auth/register").permitAll()//
                 .antMatchers("/users/**").permitAll()
-                .antMatchers("/swagger-ui.html").permitAll()
+                .antMatchers("/", "/swagger-ui.html").permitAll()
 
                 // Disallow everything else..
                 .anyRequest().authenticated();
@@ -77,7 +77,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         // Allow swagger to be accessed without authentication
         web.ignoring().antMatchers("/v2/api-docs")//
                 .antMatchers("/swagger-resources/**")//
-                .antMatchers("/swagger-ui.html")//
+                .antMatchers("/", "/swagger-ui.html")//
                 .antMatchers("/configuration/**")//
                 .antMatchers("/webjars/**")//
                 .antMatchers("/public");
