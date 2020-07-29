@@ -19,3 +19,32 @@ spec:
         - image: reckue/account:latest
           name: account
           resources: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: account
+  name: account
+spec:
+  ports:
+    - name: 8080-8080
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+  selector:
+    app: account
+  type: ClusterIP
+  ---
+  apiVersion: v1
+kind: Route
+metadata:
+  labels:
+    app: account
+  name: account
+spec:
+  host: account-reckue.apps.us-east-1.starter.openshift-online.com
+  path: "/"
+  to:
+    kind: Service
+    name: account
