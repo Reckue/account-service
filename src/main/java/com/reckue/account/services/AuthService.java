@@ -58,8 +58,9 @@ public class AuthService {
                         ", and not contain space, tab, etc.", HttpStatus.BAD_REQUEST);
             }
             // check email verification
-            if (!registerForm.getEmail().matches("\\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}\\b")) {
-                throw new InvalidDataException("Please correct, it isn't an email.", HttpStatus.BAD_REQUEST);
+            if (!registerForm.getEmail().matches("\\b[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}\\b")) {
+                throw new InvalidDataException("Please correct, it isn't an email. Use lowercase letters.",
+                        HttpStatus.BAD_REQUEST);
             }
 
             // create a new refresh token
