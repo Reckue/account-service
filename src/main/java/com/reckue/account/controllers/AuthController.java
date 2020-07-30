@@ -1,11 +1,11 @@
 package com.reckue.account.controllers;
 
+import com.reckue.account.controllers.apis.AuthApi;
 import com.reckue.account.services.AuthService;
 import com.reckue.account.transfers.AuthTransfer;
 import com.reckue.account.transfers.LoginRequest;
 import com.reckue.account.transfers.RegisterRequest;
 import com.reckue.account.transfers.UserTransfer;
-import io.swagger.annotations.*;
 import lombok.RequiredArgsConstructor;
 import org.dozer.Mapper;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -20,12 +20,11 @@ import javax.servlet.http.HttpServletRequest;
  *
  * @author Kamila Meshcheryakova
  */
-@Api(tags = "/auth")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(value = "/auth")
 @CrossOrigin(origins = "*", allowedHeaders = "*")
-public class AuthController {
+public class AuthController implements AuthApi {
 
     private final Mapper mapper;
     private final AuthService authService;
@@ -36,11 +35,6 @@ public class AuthController {
      * @param registerForm with required fields
      * @return the object of class AuthTransfer
      */
-    @ApiOperation(value = "Registration", response = AuthTransfer.class)
-    @ApiResponses(value = {
-            @ApiResponse(code = 201, message = "Register form has created"),
-            @ApiResponse(code = 400, message = "You need to change the incoming parameters"),
-            @ApiResponse(code = 500, message = "Access to the resource you tried to obtain is not possible")})
     @PostMapping("/register")
     public AuthTransfer register(@RequestBody RegisterRequest registerForm) {
         return authService.register(registerForm);
@@ -52,12 +46,6 @@ public class AuthController {
      * @param loginForm with required fields
      * @return the object of class AuthTransfer
      */
-    @ApiOperation(value = "Authorization", response = AuthTransfer.class)
-    @ApiResponses(value = {
-            @ApiResponse(code = 202, message = "Login form has accepted"),
-            @ApiResponse(code = 400, message = "You need to change the incoming parameters"),
-            @ApiResponse(code = 404, message = "The user by this username is not found"),
-            @ApiResponse(code = 500, message = "Access to the resource you tried to obtain is not possible")})
     @PostMapping("/login")
     public AuthTransfer login(@RequestBody LoginRequest loginForm) {
         return authService.login(loginForm);
@@ -69,14 +57,7 @@ public class AuthController {
      * @param request information for HTTP servlets
      * @return the object of class UserTransfer
      */
-    @ApiOperation(value = "Get current user", response = UserTransfer.class,
-            authorizations = {@Authorization(value = "JWT")})
-    @ApiResponses(value = {
-            @ApiResponse(code = 202, message = "The request has accepted"),
-            @ApiResponse(code = 400, message = "You need to change the incoming parameters"),
-            @ApiResponse(code = 404, message = "The user by this username is not found"),
-            @ApiResponse(code = 500, message = "Access to the resource you tried to obtain is not possible")})
-    @GetMapping(value = "/current_user")
+    @GetMapping(value = "/currentUser")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     public UserTransfer getCurrentUser(HttpServletRequest request) {
         return mapper.map(authService.getCurrentUser(request), UserTransfer.class);
@@ -89,15 +70,9 @@ public class AuthController {
      * @param user         authorized user
      * @return the object of class AuthTransfer
      */
-    @ApiOperation(value = "Updating", response = AuthTransfer.class,
-            authorizations = {@Authorization(value = "JWT")})
-    @ApiResponses(value = {
-            @ApiResponse(code = 201, message = "RefreshToken has updated"),
-            @ApiResponse(code = 400, message = "Invalid incoming parameters"),
-            @ApiResponse(code = 500, message = "Access to the resource you tried to obtain is not possible")})
-    @GetMapping(value = "/refresh_token")
+    @GetMapping(value = "/refreshToken")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
-    public AuthTransfer refresh(@RequestParam(name = "refresh_token") String refreshToken,
+    public AuthTransfer refresh(@RequestParam(name = "refreshToken") String refreshToken,
                                 @AuthenticationPrincipal User user) {
         return authService.refresh(user.getUsername(), refreshToken);
     }

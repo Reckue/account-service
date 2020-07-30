@@ -17,15 +17,15 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class AuthTransfer {
 
-    @JsonProperty(value = "access_token")
+    @JsonProperty(value = "accessToken")
     private String accessToken;
 
-    @JsonProperty(value = "refresh_token")
+    @JsonProperty(value = "refreshToken")
     private String refreshToken;
 
-    @JsonProperty(value = "token_type")
+    @JsonProperty(value = "tokenType")
     private String tokenType;
 
-    @JsonProperty(value = "expires_in")
+    @JsonProperty(value = "expiresIn")
     private long expiresIn;
 }

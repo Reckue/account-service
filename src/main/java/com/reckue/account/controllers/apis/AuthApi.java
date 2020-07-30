@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
  * @author Kamila Meshcheryakova
  */
 @Api(tags = "/auth")
+@SuppressWarnings("unused")
 public interface AuthApi {
 
     @ApiOperation(value = "Registration", response = AuthTransfer.class)
@@ -33,7 +34,7 @@ public interface AuthApi {
     AuthTransfer login(LoginRequest loginForm);
 
     @ApiOperation(value = "Get current user", response = UserTransfer.class,
-            authorizations = {@Authorization(value = "JWT")})
+            authorizations = {@Authorization(value = "Bearer token")})
     @ApiResponses(value = {
             @ApiResponse(code = 202, message = "The request has accepted"),
             @ApiResponse(code = 400, message = "You need to change the incoming parameters"),
@@ -42,7 +43,7 @@ public interface AuthApi {
     UserTransfer getCurrentUser(HttpServletRequest request);
 
     @ApiOperation(value = "Updating", response = AuthTransfer.class,
-            authorizations = {@Authorization(value = "JWT")})
+            authorizations = {@Authorization(value = "Bearer token")})
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "RefreshToken has updated"),
             @ApiResponse(code = 400, message = "Invalid incoming parameters"),

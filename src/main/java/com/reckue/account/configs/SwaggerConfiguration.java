@@ -130,6 +130,6 @@ public class SwaggerConfiguration implements WebMvcConfigurer {
      * @return apiKey with given parameters
      */
     private ApiKey apiKey() {
-        return new ApiKey("JWT", "Authorization", "header");
+        return new ApiKey("Bearer token", "Authorization", "header");
     }
 }
