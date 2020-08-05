@@ -14,8 +14,7 @@ import java.util.List;
 @SuppressWarnings("unused")
 public interface UserApi {
 
-    @ApiOperation(value = "View a list of available users", response = UserTransfer.class,
-            authorizations = {@Authorization(value = "Bearer token")})
+    @ApiOperation(value = "View a list of available users", response = UserTransfer.class)
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "List of users successfully retrieved"),
             @ApiResponse(code = 400, message = "You need to change the parameters of your request"),
@@ -23,16 +22,14 @@ public interface UserApi {
             @ApiResponse(code = 500, message = "Access to the resource you tried to obtain is not possible")})
     List<UserTransfer> getAll(int limit, int offset, String sort, boolean desc);
 
-    @ApiOperation(value = "Get user by id", response = UserTransfer.class,
-            authorizations = {@Authorization(value = "Bearer token")})
+    @ApiOperation(value = "Get user by id", response = UserTransfer.class)
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "The user successfully found"),
             @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
             @ApiResponse(code = 500, message = "Access to the resource you tried to obtain is not possible")})
     UserTransfer getById(String id);
 
-    @ApiOperation(value = "Get user by username", response = UserTransfer.class,
-            authorizations = {@Authorization(value = "Bearer token")})
+    @ApiOperation(value = "Get user by username", response = UserTransfer.class)
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "The user successfully found"),
             @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
