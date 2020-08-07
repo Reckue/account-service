@@ -51,10 +51,8 @@ public class AuthService {
         if (!userRepository.existsByUsername(registerForm.getUsername())) {
 
             // check password verification
-            if (!registerForm.getPassword().matches("(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=\\S+$).{8,}")) {
-                throw new InvalidDataException("Your password must contain at least 8 chars" +
-                        ", one digit" +
-                        ", one lower alpha char and one upper alpha char" +
+            if (!registerForm.getPassword().matches("(.*)(?=\\S+$).{6,}")) {
+                throw new InvalidDataException("Your password must contain at least 6 any symbols" +
                         ", and not contain space, tab, etc.", HttpStatus.BAD_REQUEST);
             }
             // check email verification
