@@ -38,7 +38,6 @@ public class UserController implements UserApi {
      * sorted by the selected parameter for sorting in descending order
      */
     @GetMapping
-    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     public List<UserTransfer> getAll(@RequestParam(required = false, defaultValue = "10") int limit,
                                      @RequestParam(required = false, defaultValue = "0") int offset,
                                      @RequestParam(required = false, defaultValue = "id") String sort,
