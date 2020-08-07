@@ -51,9 +51,9 @@ public class AuthService {
         if (!userRepository.existsByUsername(registerForm.getUsername())) {
 
             // check password verification
-            if (!registerForm.getPassword().matches("(.*)(?=\\S+$).{6,}")) {
-                throw new InvalidDataException("Your password must contain at least 6 any symbols" +
-                        ", and not contain space, tab, etc.", HttpStatus.BAD_REQUEST);
+            if (!registerForm.getPassword().matches("(.*).{6,}")) {
+                throw new InvalidDataException("Your password must contain at least 6 any symbols.",
+                        HttpStatus.BAD_REQUEST);
             }
             // check email verification
             if (!registerForm.getEmail().matches("\\b[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}\\b")) {
