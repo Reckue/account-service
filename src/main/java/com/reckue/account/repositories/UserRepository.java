@@ -1,18 +1,18 @@
 package com.reckue.account.repositories;
 
 import com.reckue.account.models.User;
-import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
 /**
- * Interface UserRepository configures the connection with MongoRepository.
+ * Interface UserRepository configures the connection with PostgreSQL.
  *
  * @author Kamila Meshcheryakova
  */
 @Repository
-public interface UserRepository extends MongoRepository<User, String> {
+public interface UserRepository extends JpaRepository<User, String> {
 
     /**
      * This method is used to check if the user with that username already exists in the database.

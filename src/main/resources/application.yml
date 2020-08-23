@@ -1,0 +1,16 @@
+#server:
+#  port: 9001
+#
+#spring:
+#  datasource:
+#    driverClassName: org.postgresql.Driver
+#    url: jdbc:postgresql://localhost:5432/account-develop
+#    username: root
+#    password: root
+#    platform: postgres
+#    initialization-mode: always
+#  # JPA config
+#  jpa:
+#    database: POSTGRESQL
+#    hibernate.ddl-auto: update
+#    generate-ddl: true

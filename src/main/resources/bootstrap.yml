@@ -8,10 +8,17 @@ server:
 
 spring:
   profiles: cloud
-  data:
-    mongodb:
-      host: mongodb
-      database: account-cloud
+#  datasource:
+#    url: jdbc:postgresql://localhost:5432/account-cloud
+#    username: root
+#    password: root
+#    driverClassName: org.postgresql.Driver
+#    platform: postgres
+#    initialization-mode: never
+#  # JPA config
+#  jpa:
+#    database: POSTGRESQL
+#    hibernate.ddl-auto: validate
 
 security:
   token:
@@ -30,9 +37,17 @@ server:
 
 spring:
   profiles: staging
-  data:
-    mongodb:
-      database: account-staging
+#  datasource:
+#    url: jdbc:postgresql://localhost:5432/account-staging
+#    username: root
+#    password: root
+#    driverClassName: org.postgresql.Driver
+#    platform: postgres
+#    initialization-mode: never
+#  # JPA config
+#  jpa:
+#    database: POSTGRESQL
+#    hibernate.ddl-auto: validate
 
 security:
   token:
@@ -47,9 +62,18 @@ server:
 spring:
   profiles:
     active: develop
-  data:
-    mongodb:
-      database: account-develop
+  datasource:
+    driverClassName: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/account-develop
+    username: root
+    password: root
+    platform: postgres
+    initialization-mode: always
+  # JPA config
+  jpa:
+    database: POSTGRESQL
+    hibernate.ddl-auto: update
+    generate-ddl: true
 
 security:
   token:
