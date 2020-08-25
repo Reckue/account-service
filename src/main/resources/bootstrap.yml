@@ -8,17 +8,17 @@ server:
 
 spring:
   profiles: cloud
-#  datasource:
-#    url: jdbc:postgresql://localhost:5432/account-cloud
-#    username: root
-#    password: root
-#    driverClassName: org.postgresql.Driver
-#    platform: postgres
-#    initialization-mode: never
-#  # JPA config
-#  jpa:
-#    database: POSTGRESQL
-#    hibernate.ddl-auto: validate
+  datasource:
+    url: jdbc:postgresql://localhost:5432/account-cloud
+    username: root
+    password: root
+    driverClassName: org.postgresql.Driver
+    platform: postgres
+    initialization-mode: always
+  # JPA config
+  jpa:
+    database: POSTGRESQL
+    hibernate.ddl-auto: validate
 
 security:
   token:
@@ -37,17 +37,17 @@ server:
 
 spring:
   profiles: staging
-#  datasource:
-#    url: jdbc:postgresql://localhost:5432/account-staging
-#    username: root
-#    password: root
-#    driverClassName: org.postgresql.Driver
-#    platform: postgres
-#    initialization-mode: never
-#  # JPA config
-#  jpa:
-#    database: POSTGRESQL
-#    hibernate.ddl-auto: validate
+  datasource:
+    url: jdbc:postgresql://localhost:5432/account-staging
+    username: root
+    password: root
+    driverClassName: org.postgresql.Driver
+    platform: postgres
+    initialization-mode: always
+  # JPA config
+  jpa:
+    database: POSTGRESQL
+    hibernate.ddl-auto: validate
 
 security:
   token:
