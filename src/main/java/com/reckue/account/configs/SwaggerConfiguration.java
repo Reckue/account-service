@@ -2,6 +2,7 @@ package com.reckue.account.configs;
 
 import com.fasterxml.classmate.TypeResolver;
 import com.reckue.account.transfers.ErrorTransfer;
+import org.hibernate.mapping.Any;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -15,6 +16,7 @@ import springfox.documentation.service.ApiInfo;
 import springfox.documentation.service.ApiKey;
 import springfox.documentation.service.Contact;
 import springfox.documentation.spi.DocumentationType;
+import springfox.documentation.spi.service.contexts.ApiSelector;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
@@ -68,6 +70,10 @@ public class SwaggerConfiguration implements WebMvcConfigurer {
                                 .message("UNAUTHORIZED")
                                 .responseModel(new ModelRef("ErrorTransfer"))
                                 .build(),
+                        new ResponseMessageBuilder().code(403)
+                                .message("ACCESS_DENIED")
+                                .responseModel(new ModelRef("ErrorTransfer"))
+                                .build(),
                         new ResponseMessageBuilder().code(409)
                                 .message("CONFLICT")
                                 .responseModel(new ModelRef("ErrorTransfer"))
@@ -87,6 +93,10 @@ public class SwaggerConfiguration implements WebMvcConfigurer {
                                 .message("UNAUTHORIZED")
                                 .responseModel(new ModelRef("ErrorTransfer"))
                                 .build(),
+                        new ResponseMessageBuilder().code(403)
+                                .message("ACCESS_DENIED")
+                                .responseModel(new ModelRef("ErrorTransfer"))
+                                .build(),
                         new ResponseMessageBuilder().code(404)
                                 .message("NOT_FOUND")
                                 .responseModel(new ModelRef("ErrorTransfer"))
@@ -99,6 +109,10 @@ public class SwaggerConfiguration implements WebMvcConfigurer {
                 .additionalModels(typeResolver.resolve(ErrorTransfer.class))
                 .globalResponseMessage(RequestMethod.DELETE, newArrayList(new ResponseMessageBuilder().code(400)
                                 .message("BAD_REQUEST")
+                                .responseModel(new ModelRef("ErrorTransfer"))
+                                .build(),
+                        new ResponseMessageBuilder().code(403)
+                                .message("ACCESS_DENIED")
                                 .responseModel(new ModelRef("ErrorTransfer"))
                                 .build(),
                         new ResponseMessageBuilder().code(404)

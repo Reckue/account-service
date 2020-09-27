@@ -1,8 +1,12 @@
 package com.reckue.account.services.implementations;
 
+import com.reckue.account.exceptions.NotFoundException;
 import com.reckue.account.models.User;
 import com.reckue.account.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AccountStatusUserDetailsChecker;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -15,10 +19,10 @@ import org.springframework.transaction.annotation.Transactional;
  *
  * @author Kamila Meshcheryakova
  */
-@Service
+@Service(value = "userDetailsService")
 @Transactional
 @RequiredArgsConstructor
-public class UserDetailsServiceImplement implements UserDetailsService {
+public class UserDetailsServiceImpl implements UserDetailsService {
 
     private final UserRepository userRepository;
 
@@ -32,17 +36,14 @@ public class UserDetailsServiceImplement implements UserDetailsService {
      */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User by username '" + username + "' not found"));
+        User user = userRepository.findByUsername(username).orElseThrow(
+                ()-> new NotFoundException(String.format("The user by username %s not found.", username),
+                        HttpStatus.NOT_FOUND));
 
-        return org.springframework.security.core.userdetails.User
-                .withUsername(username)
-                .password(user.getPassword())
-                .authorities(user.getRoles())
-                .accountExpired(false)
-                .accountLocked(false)
-                .credentialsExpired(false)
-                .disabled(false)
-                .build();
+        if (user == null)
+            throw new BadCredentialsException("Bad Credentials");
+        new AccountStatusUserDetailsChecker().check(user);
+
+        return user;
     }
 }
