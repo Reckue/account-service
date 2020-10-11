@@ -28,7 +28,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 @RequestMapping(value = "/auth")
 @CrossOrigin(origins = "*", allowedHeaders = "*")
-public class AuthController implements AuthApi {
+public class AuthController {
 
     private final Mapper mapper;
     private final AuthService authService;
@@ -76,15 +76,20 @@ public class AuthController implements AuthApi {
                                                       @RequestParam(value = "scope") String scope,
                                                       @ApiParam(example = "password")
                                                       @RequestParam(value = "grant_type") String grantType,
+                                                      @RequestParam(name = "refreshToken") String refreshToken,
                                                       @RequestParam(value = "username") String username,
                                                       @RequestParam(value = "password") String password
     ) throws HttpRequestMethodNotSupportedException {
         Map<String, String> parameters = new HashMap<>();
         parameters.put("scope", scope);
         parameters.put("grant_type", grantType);
-        parameters.put("username", username);
-        parameters.put("password", password);
-
+        if (grantType.equals("password")) {
+            parameters.put("username", username);
+            parameters.put("password", password);
+        }
+        if (grantType.equals("refresh_token")) {
+            parameters.put("refresh_token", refreshToken);
+        }
         return authService.login(tokenEndpoint.postAccessToken(principal, parameters));
     }
 
@@ -110,20 +115,25 @@ public class AuthController implements AuthApi {
     @GetMapping(value = "/refresh")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     public OAuth2AccessToken  refresh(@RequestParam(name = "refreshToken") String refreshToken,
-                                      HttpServletRequest request) throws HttpRequestMethodNotSupportedException {
+                                      HttpServletRequest request) {
         return authService.refresh(refreshToken, request);
     }
 
     @GetMapping(value = "/login")
-            //"/refresh")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
-    public OAuth2AccessToken  refreshToken(@RequestParam(name = "refreshToken") String refreshToken,
-                                           @ApiParam(example = "refresh_token")
-                                               @RequestParam(value = "grant_type") String grantType,
-                                           String clientId, String clientSecret,
-                                           Principal principal,
-                                           HttpServletRequest request
+    public ResponseEntity<OAuth2AccessToken>  refreshToken(
+            Principal principal,
+            @ApiParam(example = "write")
+            @RequestParam(value = "scope") String scope,
+            @RequestParam(name = "refreshToken") String refreshToken,
+            @ApiParam(example = "refresh_token")
+            @RequestParam(value = "grant_type") String grantType
     ) throws HttpRequestMethodNotSupportedException {
-        return authService.refreshToken(refreshToken, grantType, principal, request);
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("grant_type", grantType);
+        parameters.put("refresh_token", refreshToken);
+        parameters.put("scope", scope);
+        ResponseEntity<OAuth2AccessToken> responseEntity = tokenEndpoint.postAccessToken(principal, parameters);
+        return authService.login(responseEntity);
     }
 }

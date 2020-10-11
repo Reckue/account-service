@@ -1,11 +1,13 @@
 package com.reckue.account.configs;
 
+import com.reckue.account.services.implementations.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
@@ -35,6 +37,8 @@ public class AuthServerConfig extends AuthorizationServerConfigurerAdapter {
     private String secretKey;
 
     private final PasswordEncoder passwordEncoder;
+
+    private final UserDetailsServiceImpl userDetailsService;
 
     private final AuthenticationManager authenticationManager;
 
@@ -91,8 +95,7 @@ public class AuthServerConfig extends AuthorizationServerConfigurerAdapter {
 
     @Bean
     DefaultOAuth2RequestFactory defaultOAuth2RequestFactory() {
-        return //new DefaultOAuth2RequestFactory(clientDetailsService);
-                new CustomOauth2RequestFactory(clientDetailsService);
+        return new CustomOauth2RequestFactory(clientDetailsService);
     }
 
     /**
@@ -103,7 +106,9 @@ public class AuthServerConfig extends AuthorizationServerConfigurerAdapter {
     @Override
     public void configure(AuthorizationServerEndpointsConfigurer endpoints) {
         endpoints.authenticationManager(authenticationManager)
-                .tokenStore(tokenStore()).tokenEnhancer(jwtAccessTokenConverter())
+                .userDetailsService(userDetailsService)
+                .tokenStore(tokenStore())
+                .tokenEnhancer(jwtAccessTokenConverter())
                 .pathMapping("/oauth/token", "/auth/login");
     }
 }
