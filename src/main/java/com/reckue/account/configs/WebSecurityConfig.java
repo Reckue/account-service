@@ -6,8 +6,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -55,38 +55,20 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         return super.authenticationManagerBean();
     }
 
-//    @Override
-//    protected void configure(HttpSecurity http) throws Exception {
-//        http.csrf().disable().exceptionHandling()
-//                .authenticationEntryPoint((httpServletRequest, httpServletResponse, authException) ->
-//                        httpServletResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED))
-//                .and().authorizeRequests().antMatchers("/auth/refreshToken", "/auth/currentUser")
-//                .authenticated().and().httpBasic();
-//    }
-
-    //    @Override
-//    protected void configure(HttpSecurity http) throws Exception {
-//
-//        http.csrf().and()
-//                .authorizeRequests()
-//                .antMatchers("/auth/refreshToken", "/auth/currentUser")
-//                .authenticated()
-//                .anyRequest()
-//                .permitAll()
-//                .and()
-//                .formLogin().disable();
-//    }
     @Override
     public void configure(HttpSecurity http) throws Exception {
+        http.cors();
         http.csrf().disable()
-                .authorizeRequests()
-                //.antMatchers("/auth/currentUser", "/auth/refreshToken").authenticated()
-                .anyRequest().permitAll()
-                .and().exceptionHandling()
+              //  .authorizeRequests()
+               // .antMatchers("/auth/current").hasAuthority("ROLE_USER")
+//                .antMatchers("/users/delete/**").hasRole("ADMIN")
+               // .anyRequest().permitAll()
+                //.and()
+                .exceptionHandling()
                 .authenticationEntryPoint(
                         (httpServletRequest, httpServletResponse, authExc) ->
-                                httpServletResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED))
+                                httpServletResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, String.valueOf(authExc)))
                 .accessDeniedHandler((httpServletRequest, httpServletResponse, e) ->
-                        httpServletResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED));
+                        httpServletResponse.sendError(HttpServletResponse.SC_FORBIDDEN, String.valueOf(e)));
     }
 }

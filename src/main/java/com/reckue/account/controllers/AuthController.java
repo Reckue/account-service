@@ -38,54 +38,51 @@ public class AuthController implements AuthApi {
      * This type of request allows to register a new user.
      *
      * @param registerForm with required fields
-     * @return the object of class AuthTransfer             !!!
+     * @return string
      */
     @PostMapping("/register")
-//    public AuthTransfer register(@RequestBody RegisterRequest registerForm) {
-//        return authService.register(registerForm);
-//    }
     public String register(@RequestBody RegisterRequest registerForm) {
         authService.register(registerForm);
         return "You have successfully registered";
     }
 
     /**
-     * This type of request allows an authorized user to log in.
+     * This type of request allows an authorized user to log in using such params as:
+     * scope, grantType - password, username and password, -
+     * or allows to refresh the existing token using such params as:
+     * scope, grantType - refresh_token, refreshToken.
      *
-     * @param loginForm with required fields
-     * @return the object of class AuthTransfer
+     * @param principal - client
+     * @param scope - allowed scope like "write"
+     * @param grantType - "password" or "refresh_token"
+     * @param username - name of the user - not necessary for grantType "refresh_token"
+     * @param password - password of the user - not necessary for grantType "refresh_token"
+     * @param refreshToken - saved refreshToken of the user - not necessary for grantType "password"
+     * @return JWT
      */
-    /**
-     *
-     *
-     * @param principal
-     * @param scope
-     * @param grantType
-     * @param username
-     * @param password
-     * @return
-     * @throws HttpRequestMethodNotSupportedException
-     */
-//    @PostMapping("/login")
-//    public AuthTransfer login(@RequestBody LoginRequest loginForm) {
-//        return authService.login(loginForm);
-//    }
-    @PostMapping("/login")
+    @PostMapping("/token")
     public ResponseEntity<OAuth2AccessToken> getToken(Principal principal,
                                                       @ApiParam(example = "write")
                                                       @RequestParam(value = "scope") String scope,
                                                       @ApiParam(example = "password")
                                                       @RequestParam(value = "grant_type") String grantType,
-                                                      @RequestParam(value = "username") String username,
-                                                      @RequestParam(value = "password") String password
+                                                      @RequestParam(value = "username", required = false) String username,
+                                                      @RequestParam(value = "password", required = false) String password,
+                                                      @RequestParam(name = "refreshToken", defaultValue = "") String refreshToken
     ) throws HttpRequestMethodNotSupportedException {
         Map<String, String> parameters = new HashMap<>();
         parameters.put("scope", scope);
         parameters.put("grant_type", grantType);
-        parameters.put("username", username);
-        parameters.put("password", password);
-
-        return authService.login(tokenEndpoint.postAccessToken(principal, parameters));
+        if (grantType.equals("password")) {
+            parameters.put("username", username);
+            parameters.put("password", password);
+        }
+        if (grantType.equals("refresh_token")) {
+            parameters.put("refresh_token", refreshToken);
+        }
+        ResponseEntity<OAuth2AccessToken> jwt = tokenEndpoint.postAccessToken(principal, parameters);
+        authService.saveAndCheckRefreshToken(jwt, refreshToken);
+        return jwt;
     }
 
     /**
@@ -98,32 +95,5 @@ public class AuthController implements AuthApi {
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     public UserTransfer getCurrentUser(HttpServletRequest request) {
         return mapper.map(authService.getCurrentUser(request), UserTransfer.class);
-    }
-
-    /**
-     * This type of request allows to update the token of an authorized user.
-     *
-     * @param refreshToken token of an authorized user
-     * @param user         authorized user
-     * @return the object of class AuthTransfer
-     */
-    @GetMapping(value = "/refresh")
-    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
-    public OAuth2AccessToken  refresh(@RequestParam(name = "refreshToken") String refreshToken,
-                                      HttpServletRequest request) throws HttpRequestMethodNotSupportedException {
-        return authService.refresh(refreshToken, request);
-    }
-
-    @GetMapping(value = "/login")
-            //"/refresh")
-    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
-    public OAuth2AccessToken  refreshToken(@RequestParam(name = "refreshToken") String refreshToken,
-                                           @ApiParam(example = "refresh_token")
-                                               @RequestParam(value = "grant_type") String grantType,
-                                           String clientId, String clientSecret,
-                                           Principal principal,
-                                           HttpServletRequest request
-    ) throws HttpRequestMethodNotSupportedException {
-        return authService.refreshToken(refreshToken, grantType, principal, request);
     }
 }

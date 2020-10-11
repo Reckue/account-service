@@ -55,7 +55,7 @@ public class UserController implements UserApi {
      * @param id the object identifier
      * @return the object of class UserTransfer
      */
-    @GetMapping("/{id}")
+    @GetMapping("/id/{id}")
     public UserTransfer getById(@PathVariable String id) {
         return mapper.map(userService.findById(id), UserTransfer.class);
     }
@@ -76,7 +76,7 @@ public class UserController implements UserApi {
      *
      * @param id the object identifier
      */
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/id/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public void deleteById(@PathVariable String id) {
         userService.deleteById(id);
@@ -87,7 +87,7 @@ public class UserController implements UserApi {
      *
      * @param username the object name
      */
-    @DeleteMapping("/username/{username}")
+    @DeleteMapping("/delete/username/{username}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public void deleteByUsername(@PathVariable String username) {
         userService.deleteByUsername(username);

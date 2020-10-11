@@ -6,11 +6,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
+import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
 import org.springframework.security.oauth2.provider.ClientDetailsService;
 import org.springframework.security.oauth2.provider.request.DefaultOAuth2RequestFactory;
 import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
@@ -35,8 +37,8 @@ public class AuthServerConfig extends AuthorizationServerConfigurerAdapter {
     private String secretKey;
 
     private final PasswordEncoder passwordEncoder;
-
     private final AuthenticationManager authenticationManager;
+    private final UserDetailsService userDetailsService;
 
     @PostConstruct
     protected void init() {
@@ -86,14 +88,14 @@ public class AuthServerConfig extends AuthorizationServerConfigurerAdapter {
         return defaultTokenServices;
     }
 
-    @Autowired
-    ClientDetailsService clientDetailsService;
-
-    @Bean
-    DefaultOAuth2RequestFactory defaultOAuth2RequestFactory() {
-        return //new DefaultOAuth2RequestFactory(clientDetailsService);
-                new CustomOauth2RequestFactory(clientDetailsService);
-    }
+//    @Autowired
+//    ClientDetailsService clientDetailsService;
+//
+//    @Bean
+//    DefaultOAuth2RequestFactory defaultOAuth2RequestFactory() {
+//        return //new DefaultOAuth2RequestFactory(clientDetailsService);
+//                new CustomOauth2RequestFactory(clientDetailsService);
+//    }
 
     /**
      * This method allows to set configurations for secured endpoints.
@@ -103,7 +105,13 @@ public class AuthServerConfig extends AuthorizationServerConfigurerAdapter {
     @Override
     public void configure(AuthorizationServerEndpointsConfigurer endpoints) {
         endpoints.authenticationManager(authenticationManager)
+                .userDetailsService(userDetailsService)
                 .tokenStore(tokenStore()).tokenEnhancer(jwtAccessTokenConverter())
-                .pathMapping("/oauth/token", "/auth/login");
+                .pathMapping("/oauth/token", "/auth/token");
+    }
+
+    @Override
+    public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
+        security.allowFormAuthenticationForClients();
     }
 }
