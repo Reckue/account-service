@@ -1,9 +1,6 @@
 package com.reckue.account.handlers;
 
-import com.reckue.account.exceptions.AlreadyExistsException;
-import com.reckue.account.exceptions.AuthenticationException;
-import com.reckue.account.exceptions.InvalidDataException;
-import com.reckue.account.exceptions.NotFoundException;
+import com.reckue.account.exceptions.*;
 import com.reckue.account.transfers.ErrorTransfer;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +25,18 @@ public class CustomExceptionHandler {
     public ResponseEntity<?> handleAuthenticationException(AuthenticationException e) {
         return new ResponseEntity<>(new ErrorTransfer(e.getMessage(), HttpStatus.UNAUTHORIZED,
                 HttpStatus.UNAUTHORIZED.value()), HttpStatus.UNAUTHORIZED);
+    }
+
+    /**
+     * This method is used to handle an AccessDeniedException.
+     *
+     * @param e AuthenticationException
+     * @return an exception response in the form of an object ErrorTransfer class
+     */
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<?> handleAccessDeniedException(AccessDeniedException e) {
+        return new ResponseEntity<>(new ErrorTransfer(e.getMessage(), HttpStatus.FORBIDDEN,
+                HttpStatus.FORBIDDEN.value()), HttpStatus.FORBIDDEN);
     }
 
     /**

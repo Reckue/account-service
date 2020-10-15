@@ -3,6 +3,7 @@ package com.reckue.account.controllers.apis;
 import com.reckue.account.transfers.UserTransfer;
 import io.swagger.annotations.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /**
@@ -41,12 +42,12 @@ public interface UserApi {
             @ApiResponse(code = 200, message = "The user successfully deleted"),
             @ApiResponse(code = 404, message = "The resource you were trying to delete is not found"),
             @ApiResponse(code = 500, message = "Access to the resource you tried to obtain is not possible")})
-    void deleteById(String id);
+    void deleteById(String id, HttpServletRequest request);
 
     @ApiOperation(value = "Delete user by username", authorizations = {@Authorization(value = "Bearer token")})
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "The user successfully deleted"),
             @ApiResponse(code = 404, message = "The resource you were trying to delete is not found"),
             @ApiResponse(code = 500, message = "Access to the resource you tried to obtain is not possible")})
-    void deleteByUsername(String username);
+    void deleteByUsername(String username, HttpServletRequest request);
 }
