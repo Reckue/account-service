@@ -110,7 +110,7 @@ public class UserService {
      * @param id the object identifier
      */
     public void deleteById(String id) {
-        if (!userRepository.existsById(id)) {
+        if (userRepository.existsById(id)) {
             userRepository.deleteById(id);
         } else {
             throw new NotFoundException("The user by id '" + id + "' not found", HttpStatus.NOT_FOUND);

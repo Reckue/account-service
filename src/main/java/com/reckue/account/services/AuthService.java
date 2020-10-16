@@ -1,6 +1,5 @@
 package com.reckue.account.services;
 
-import com.reckue.account.configs.filters.TokenProvider;
 import com.reckue.account.exceptions.AuthenticationException;
 import com.reckue.account.exceptions.InvalidDataException;
 import com.reckue.account.exceptions.NotFoundException;
@@ -8,45 +7,47 @@ import com.reckue.account.models.Role;
 import com.reckue.account.models.Status;
 import com.reckue.account.models.User;
 import com.reckue.account.repositories.UserRepository;
-import com.reckue.account.transfers.AuthTransfer;
-import com.reckue.account.transfers.LoginRequest;
 import com.reckue.account.transfers.RegisterRequest;
 import com.reckue.account.utils.helpers.RandomHelper;
 import com.reckue.account.utils.helpers.TimestampHelper;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.common.OAuth2AccessToken;
+import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashSet;
+import java.util.Objects;
+
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 /**
  * Class AuthService represents service with operations related to authentication and authorization.
  *
  * @author Kamila Meshcheryakova
  */
+@Slf4j
 @Service
 @Transactional
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class AuthService {
 
-    private final TokenProvider tokenProvider;
+    private final TokenStore tokenStore;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final AuthenticationManager authenticationManager;
 
     /**
      * This method is used to register a new user.
      * Throws {@link AuthenticationException} in case if user with such username already exists.
      *
      * @param registerForm with required fields
-     * @return the object of class AuthTransfer
      */
-    public AuthTransfer register(RegisterRequest registerForm) {
+    public void register(RegisterRequest registerForm) {
         // checking that the user exists in the database
         if (!userRepository.existsByUsername(registerForm.getUsername())) {
 
@@ -61,16 +62,12 @@ public class AuthService {
                         HttpStatus.BAD_REQUEST);
             }
 
-            // create a new refresh token
-            String refreshToken = tokenProvider.createRefreshToken();
-
             // create instance of user model and fill it
             User user = User.builder()
                     .id(RandomHelper.generate(registerForm.getUsername()))
                     .username(registerForm.getUsername())
                     .email(registerForm.getEmail())
                     .password(passwordEncoder.encode(registerForm.getPassword()))
-                    .refreshToken(refreshToken)
                     .roles(new HashSet<>())
                     .status(Status.ACTIVE)
                     .created(TimestampHelper.getCurrentTimestamp())
@@ -84,111 +81,58 @@ public class AuthService {
             // save the user in database
             userRepository.save(user);
 
-            // create tokens transfer object and return it
-            return AuthTransfer.builder()
-                    .accessToken(tokenProvider.createAccessToken(user.getUsername(), user.getRoles()))
-                    .refreshToken(refreshToken)
-                    .tokenType(tokenProvider.getTokenType())
-                    .expiresIn(tokenProvider.getExpire())
-                    .build();
         } else {
             throw new AuthenticationException("Username already exists", HttpStatus.BAD_REQUEST);
         }
     }
 
     /**
-     * This method is used an authorized user to log in.
+     * This method is used to save refresh token of the user in database
+     * and in case of grandType "refresh_token" is used to check the validity of the refresh token.
      * Throws {@link NotFoundException} in case if such user isn't contained in database.
-     * Throws {@link AuthenticationException} in case if user enters invalid username or password.
+     * Throws {@link AuthenticationException} in case if user enters invalid refresh token.
      *
-     * @param loginForm with required fields
-     * @return the object of class AuthTransfer
+     * @param responseEntity JWT
+     * @param refreshToken "" or saved refresh token of the user
      */
-    public AuthTransfer login(LoginRequest loginForm) {
-        try {
-            // find user from database
-            User user = userRepository.findByUsername(loginForm.getUsername()).orElseThrow(() ->
-                    new NotFoundException("The user by username [" + loginForm.getUsername() + "] not found",
-                            HttpStatus.NOT_FOUND));
-
-            // create a new refresh token
-            String refreshToken = tokenProvider.createRefreshToken();
-
-            // update refresh token
-            user.setRefreshToken(refreshToken);
-
-            // update last visit date
-            user.setLastVisit(TimestampHelper.getCurrentTimestamp());
-
-            // update user details in database
-            userRepository.save(user);
-
-            // authenticate this user in the authentication manager
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginForm.getUsername(),
-                    loginForm.getPassword()));
-
-            // create tokens transfer object and return it
-            return AuthTransfer.builder()
-                    .accessToken(tokenProvider.createAccessToken(user.getUsername(), user.getRoles()))
-                    .refreshToken(refreshToken)
-                    .tokenType(tokenProvider.getTokenType())
-                    .expiresIn(tokenProvider.getExpire())
-                    .build();
-        } catch (AuthenticationException e) {
-            throw new AuthenticationException("Invalid username or password supplied", HttpStatus.BAD_REQUEST);
+    public void saveAndCheckRefreshToken (ResponseEntity<OAuth2AccessToken> responseEntity, String refreshToken) {
+        String userId = (String) Objects.requireNonNull(responseEntity.getBody()).getAdditionalInformation().get("userId");
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("The user by userId [" + userId + "] not found",
+                        HttpStatus.NOT_FOUND));
+        if (!refreshToken.isEmpty() && !user.getRefreshToken().equals(refreshToken)) {
+            throw new AuthenticationException("Invalid refresh token", HttpStatus.UNAUTHORIZED);
         }
-    }
 
+        // update last visit date
+        user.setLastVisit(TimestampHelper.getCurrentTimestamp());
+        user.setRefreshToken(responseEntity.getBody().getRefreshToken().toString());
+    }
     /**
      * This method is used to get the user by his token.
      * Throws {@link NotFoundException} in case if such user isn't contained in database.
+     * Throws {@link AuthenticationException} in the absence of a token.
      *
      * @param request information for HTTP servlets
      * @return the object of class UserTransfer
      */
     public User getCurrentUser(HttpServletRequest request) {
         // get username from jwt token
-        String username = tokenProvider.getUsernameByToken(tokenProvider.extractToken(request));
+        String token = request.getHeader(AUTHORIZATION).substring(7);
+        log.info("token = " + token);
+        if (token.length() < 15) {
+            throw new AuthenticationException("There isn't any token", HttpStatus.UNAUTHORIZED);
+        }
+        String userId = (String) tokenStore.readAccessToken(token).getAdditionalInformation().get("userId");
 
         // find user by username from database
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new NotFoundException("The user by username [" + username + "] not found",
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("The user by userId [" + userId + "] not found",
                         HttpStatus.NOT_FOUND));
 
         // update last visit date
         user.setLastVisit(TimestampHelper.getCurrentTimestamp());
 
         return user;
-    }
-
-    /**
-     * This method is used to update the token of an authorized user.
-     * Throws {@link AuthenticationException} in case if an invalid refresh token is entered.
-     *
-     * @param username     name of user
-     * @param refreshToken token of an authorized user
-     * @return the object of class AuthTransfer
-     */
-    public AuthTransfer refresh(String username, String refreshToken) {
-        // get instance of user model by username from database
-        User userModel = userRepository.findByUsername(username)
-                .orElseThrow(() -> new NotFoundException("The user by username [" + username + "] not found",
-                        HttpStatus.NOT_FOUND));
-
-        // check for equality of refresh tokens
-        if (userModel.getRefreshToken().equals(refreshToken)) {
-
-            // update last visit date
-            userModel.setLastVisit(TimestampHelper.getCurrentTimestamp());
-
-            return AuthTransfer.builder()
-                    .accessToken(tokenProvider.createAccessToken(username, userModel.getRoles()))
-                    .refreshToken(tokenProvider.createRefreshToken())
-                    .tokenType(tokenProvider.getTokenType())
-                    .expiresIn(tokenProvider.getExpire())
-                    .build();
-        } else {
-            throw new AuthenticationException("Invalid refresh token", HttpStatus.BAD_REQUEST);
-        }
     }
 }
