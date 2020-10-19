@@ -1,5 +1,6 @@
 package com.reckue.account.services;
 
+import com.reckue.account.exceptions.AccessDeniedException;
 import com.reckue.account.exceptions.AlreadyExistsException;
 import com.reckue.account.exceptions.NotFoundException;
 import com.reckue.account.models.Role;
@@ -14,11 +15,14 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * Class UserService represents service with operations related to the user and the database.
@@ -34,6 +38,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final TokenStore tokenStore;
 
     /**
      * This method is used to find all the users in the database that meet the requirements.
@@ -92,28 +97,48 @@ public class UserService {
     /**
      * This method is user to delete the user by name.
      * Throws {@link NotFoundException} in case if such user isn't contained in database.
+     * Throws {@link AccessDeniedException} in case if the user isn't the same user or
+     * hasn't admin authorities.
      *
      * @param username the object name
      */
-    public void deleteByUsername(String username) {
-        if (userRepository.existsByUsername(username)) {
-            userRepository.deleteByUsername(username);
-        } else {
+    public void deleteByUsername(String username, String token) {
+        if (!userRepository.existsByUsername(username)) {
             throw new NotFoundException("The user by username '" + username + "' not found", HttpStatus.NOT_FOUND);
+        }
+        Map<String, Object> tokenInfo = tokenStore.readAccessToken(token).getAdditionalInformation();
+        Optional<User> user = userRepository.findByUsername(username);
+        if (user.isPresent()) {
+            String userId = user.get().getId();
+            if (tokenInfo.get("userId").equals(userId) || tokenInfo.get("authorities").equals("ROLE_ADMIN")) {
+                userRepository.deleteByUsername(username);
+            } else {
+                throw new AccessDeniedException("The operation forbidden", HttpStatus.FORBIDDEN);
+            }
         }
     }
 
     /**
      * This method is user to delete the user by id.
      * Throws {@link NotFoundException} in case if such user isn't contained in database.
+     * Throws {@link AccessDeniedException} in case if the user isn't the same user or
+     * hasn't admin authorities.
      *
      * @param id the object identifier
      */
-    public void deleteById(String id) {
-        if (userRepository.existsById(id)) {
-            userRepository.deleteById(id);
-        } else {
+    public void deleteById(String id, String token) {
+        if (!userRepository.existsById(id)) {
             throw new NotFoundException("The user by id '" + id + "' not found", HttpStatus.NOT_FOUND);
+        }
+        Map<String, Object> tokenInfo = tokenStore.readAccessToken(token).getAdditionalInformation();
+        Optional<User> user = userRepository.findById(id);
+        if (user.isPresent()) {
+            String userId = user.get().getId();
+            if (tokenInfo.get("userId").equals(userId) || tokenInfo.get("authorities").equals("ROLE_ADMIN")) {
+                userRepository.deleteById(id);
+            } else {
+                throw new AccessDeniedException("The operation forbidden", HttpStatus.FORBIDDEN);
+            }
         }
     }
 

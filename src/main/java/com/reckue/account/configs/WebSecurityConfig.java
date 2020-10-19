@@ -7,7 +7,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -59,11 +58,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public void configure(HttpSecurity http) throws Exception {
         http.cors();
         http.csrf().disable()
-              //  .authorizeRequests()
-               // .antMatchers("/auth/current").hasAuthority("ROLE_USER")
-//                .antMatchers("/users/delete/**").hasRole("ADMIN")
-               // .anyRequest().permitAll()
-                //.and()
+                .authorizeRequests()
+//                .antMatchers("/auth/current", "/users/delete/**").authenticated()
+                .anyRequest().permitAll()
+                .and()
                 .exceptionHandling()
                 .authenticationEntryPoint(
                         (httpServletRequest, httpServletResponse, authExc) ->

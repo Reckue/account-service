@@ -1,12 +1,14 @@
 package com.reckue.account.controllers;
 
 import com.reckue.account.controllers.apis.AuthApi;
+import com.reckue.account.exceptions.AuthenticationException;
 import com.reckue.account.services.AuthService;
 import com.reckue.account.transfers.RegisterRequest;
 import com.reckue.account.transfers.UserTransfer;
 import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import org.dozer.Mapper;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
@@ -18,6 +20,8 @@ import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
 import java.util.HashMap;
 import java.util.Map;
+
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 /**
  * Class AuthСontroller represents a REST-Controller with post and get operations connection with authentication.
@@ -52,11 +56,11 @@ public class AuthController implements AuthApi {
      * or allows to refresh the existing token using such params as:
      * scope, grantType - refresh_token, refreshToken.
      *
-     * @param principal - client
-     * @param scope - allowed scope like "write"
-     * @param grantType - "password" or "refresh_token"
-     * @param username - name of the user - not necessary for grantType "refresh_token"
-     * @param password - password of the user - not necessary for grantType "refresh_token"
+     * @param principal    - client
+     * @param scope        - allowed scope like "write"
+     * @param grantType    - "password" or "refresh_token"
+     * @param username     - name of the user - not necessary for grantType "refresh_token"
+     * @param password     - password of the user - not necessary for grantType "refresh_token"
      * @param refreshToken - saved refreshToken of the user - not necessary for grantType "password"
      * @return JWT
      */
@@ -87,6 +91,7 @@ public class AuthController implements AuthApi {
 
     /**
      * This type of request allows to get the user by his token.
+     * Throws {@link AuthenticationException} in the absence of a token.
      *
      * @param request information for HTTP servlets
      * @return the object of class UserTransfer
@@ -94,6 +99,13 @@ public class AuthController implements AuthApi {
     @GetMapping(value = "/current")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     public UserTransfer getCurrentUser(HttpServletRequest request) {
-        return mapper.map(authService.getCurrentUser(request), UserTransfer.class);
+        try {
+            String token = request.getHeader(AUTHORIZATION).substring(7);
+            return mapper.map(authService.getCurrentUser(token), UserTransfer.class);
+        } catch (NullPointerException e) {
+            throw new AuthenticationException("Token missing", HttpStatus.BAD_REQUEST);
+        } catch (StringIndexOutOfBoundsException e) {
+            throw new AuthenticationException("Token is too short", HttpStatus.BAD_REQUEST);
+        }
     }
 }

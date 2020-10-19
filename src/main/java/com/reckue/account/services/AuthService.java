@@ -20,11 +20,8 @@ import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.HashSet;
 import java.util.Objects;
-
-import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 /**
  * Class AuthService represents service with operations related to authentication and authorization.
@@ -93,9 +90,9 @@ public class AuthService {
      * Throws {@link AuthenticationException} in case if user enters invalid refresh token.
      *
      * @param responseEntity JWT
-     * @param refreshToken "" or saved refresh token of the user
+     * @param refreshToken   "" or saved refresh token of the user
      */
-    public void saveAndCheckRefreshToken (ResponseEntity<OAuth2AccessToken> responseEntity, String refreshToken) {
+    public void saveAndCheckRefreshToken(ResponseEntity<OAuth2AccessToken> responseEntity, String refreshToken) {
         String userId = (String) Objects.requireNonNull(responseEntity.getBody()).getAdditionalInformation().get("userId");
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("The user by userId [" + userId + "] not found",
@@ -108,31 +105,32 @@ public class AuthService {
         user.setLastVisit(TimestampHelper.getCurrentTimestamp());
         user.setRefreshToken(responseEntity.getBody().getRefreshToken().toString());
     }
+
     /**
      * This method is used to get the user by his token.
      * Throws {@link NotFoundException} in case if such user isn't contained in database.
-     * Throws {@link AuthenticationException} in the absence of a token.
+     * Throws {@link AuthenticationException} in case of invalid token.
      *
-     * @param request information for HTTP servlets
+     * @param token user token
      * @return the object of class UserTransfer
      */
-    public User getCurrentUser(HttpServletRequest request) {
-        // get username from jwt token
-        String token = request.getHeader(AUTHORIZATION).substring(7);
-        log.info("token = " + token);
-        if (token.length() < 15) {
-            throw new AuthenticationException("There isn't any token", HttpStatus.UNAUTHORIZED);
+    public User getCurrentUser(String token) {
+        // get userId from jwt token
+        try {
+            String userId = (String) tokenStore.readAccessToken(token).getAdditionalInformation().get("userId");
+
+            // find user by username from database
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new NotFoundException("The user by userId [" + userId + "] not found",
+                            HttpStatus.NOT_FOUND));
+
+            // update last visit date
+            user.setLastVisit(TimestampHelper.getCurrentTimestamp());
+
+            return user;
+        } catch (Exception e) {
+            throw new AuthenticationException("Invalid token", HttpStatus.UNAUTHORIZED);
         }
-        String userId = (String) tokenStore.readAccessToken(token).getAdditionalInformation().get("userId");
 
-        // find user by username from database
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("The user by userId [" + userId + "] not found",
-                        HttpStatus.NOT_FOUND));
-
-        // update last visit date
-        user.setLastVisit(TimestampHelper.getCurrentTimestamp());
-
-        return user;
     }
 }
