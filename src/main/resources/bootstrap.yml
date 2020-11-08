@@ -2,6 +2,9 @@ spring:
   application:
     name: account-api
 
+  liquibase:
+    changeLog: "classpath:migrations/changelog-master.yaml"
+
 --- # cloud # ---
 server:
   port: 8080

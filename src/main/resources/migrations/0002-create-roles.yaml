@@ -1,0 +1,26 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-table-roles
+      author: camelya
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            tableExists:
+              tableName: roles
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: roles_pkey
+                  name: id
+                  type: bigint
+              - column:
+                  constraints:
+                    nullable: false
+                  name: name
+                  type: VARCHAR(255)
+            tableName: roles
