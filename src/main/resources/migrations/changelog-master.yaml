@@ -1,0 +1,7 @@
+databaseChangeLog:
+  - include:
+      file: migrations/0001-create-users.yaml
+  - include:
+      file: migrations/0002-create-roles.yaml
+  - include:
+      file: migrations/0003-create-role-users.yaml

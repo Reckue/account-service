@@ -1,0 +1,61 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-table-users
+      author: camelya
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            tableExists:
+              tableName: users
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: false
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: users_pkey
+                  name: id
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: status
+                  type: integer
+              - column:
+                  constraints:
+                    nullable: false
+                  name: username
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: email
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: password
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: refresh_token
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: last_visit
+                  type: bigint
+              - column:
+                  constraints:
+                    nullable: false
+                  name: created
+                  type: bigint
+              - column:
+                  constraints:
+                    nullable: false
+                  name: updated
+                  type: bigint
+            tableName: users

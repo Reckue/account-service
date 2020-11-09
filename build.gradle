@@ -41,6 +41,9 @@ dependencies {
     /* eureka client */
     implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client:2.2.2.RELEASE'
 
+    /* migrations */
+    implementation 'org.liquibase:liquibase-core:4.1.1'
+
     /* test */
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'com.h2database:h2:1.4.200'

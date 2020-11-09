@@ -1,0 +1,19 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-table-role-users
+      author: camelya
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            tableExists:
+              tableName: role_users
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  name: users_id
+                  type: VARCHAR(255)
+              - column:
+                  name: role_id
+                  type: bigint
+            tableName: role_users
