@@ -50,7 +50,7 @@ public class SwaggerConfig implements WebMvcConfigurer {
     public Docket docket(TypeResolver typeResolver) {
         return new Docket(DocumentationType.SWAGGER_2)
                 .select()
-                .apis(RequestHandlerSelectors.basePackage("com.reckue.account.controllers"))
+                .apis(RequestHandlerSelectors.basePackage("com.reckue.account.controller"))
                 .build()
                 .apiInfo(apiInfo())
                 .securitySchemes(Collections.singletonList(apiKey()))
