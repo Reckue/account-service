@@ -1,7 +1,7 @@
 # account-api
 ![deploy](https://github.com/Reckue/account-api/workflows/deploy/badge.svg)
 
-Service for account autorization.
+Service for user authorization.
 
 ## Stack
 - JDK 11
