@@ -1,0 +1,24 @@
+databaseChangeLog:
+  - changeSet:
+      id: rename-table-role-users
+      author: camelya
+      preConditions:
+        - onFail: MARK_RAN
+      changes:
+        - dropTable:
+            cascadeConstraints:  false
+            catalogName:  account-develop
+            schemaName:  public
+            tableName:  role_accounts
+        - renameTable:
+            catalogName:  account-develop
+            newTableName:  role_accounts
+            oldTableName:  role_users
+            schemaName:  public
+        - renameColumn:
+            catalogName:  account-develop
+            columnDataType:  varchar(255)
+            newColumnName:  accounts_id
+            oldColumnName:  users_id
+            schemaName:  public
+            tableName:  role_accounts

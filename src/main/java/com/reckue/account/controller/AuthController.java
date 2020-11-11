@@ -3,8 +3,8 @@ package com.reckue.account.controller;
 import com.reckue.account.controller.api.AuthApi;
 import com.reckue.account.exception.AuthenticationException;
 import com.reckue.account.service.AuthService;
+import com.reckue.account.transfer.AccountTransfer;
 import com.reckue.account.transfer.RegisterRequest;
-import com.reckue.account.transfer.UserTransfer;
 import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import org.dozer.Mapper;
@@ -39,7 +39,7 @@ public class AuthController implements AuthApi {
     private final TokenEndpoint tokenEndpoint;
 
     /**
-     * This type of request allows to register a new user.
+     * This type of request allows to register a new account.
      *
      * @param registerForm with required fields
      * @return string
@@ -59,9 +59,9 @@ public class AuthController implements AuthApi {
      * @param principal    - client
      * @param scope        - allowed scope like "write"
      * @param grantType    - "password" or "refresh_token"
-     * @param username     - name of the user - not necessary for grantType "refresh_token"
-     * @param password     - password of the user - not necessary for grantType "refresh_token"
-     * @param refreshToken - saved refreshToken of the user - not necessary for grantType "password"
+     * @param username     - username of the account - not necessary for grantType "refresh_token"
+     * @param password     - password of the account - not necessary for grantType "refresh_token"
+     * @param refreshToken - saved refreshToken of the account - not necessary for grantType "password"
      * @return JWT
      */
     @PostMapping("/token")
@@ -90,18 +90,18 @@ public class AuthController implements AuthApi {
     }
 
     /**
-     * This type of request allows to get the user by his token.
+     * This type of request allows to get the account by user token.
      * Throws {@link AuthenticationException} in the absence of a token.
      *
      * @param request information for HTTP servlets
-     * @return the object of class UserTransfer
+     * @return the object of class AccountTransfer
      */
     @GetMapping(value = "/current")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
-    public UserTransfer getCurrentUser(HttpServletRequest request) {
+    public AccountTransfer getCurrentUser(HttpServletRequest request) {
         try {
             String token = request.getHeader(AUTHORIZATION).substring(7);
-            return mapper.map(authService.getCurrentUser(token), UserTransfer.class);
+            return mapper.map(authService.getCurrentUser(token), AccountTransfer.class);
         } catch (NullPointerException e) {
             throw new AuthenticationException("Token missing", HttpStatus.BAD_REQUEST);
         } catch (StringIndexOutOfBoundsException e) {

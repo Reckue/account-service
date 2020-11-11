@@ -50,7 +50,7 @@ public class CustomErrorHandler implements ErrorController {
 
     /**
      * This method is used to provide access to error attributes
-     * which can be logged or presented to the user.
+     * which can be logged or presented to the account.
      *
      * @param request generic web request interceptors
      * @return map of error attributes

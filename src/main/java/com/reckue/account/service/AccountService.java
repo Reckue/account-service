@@ -3,10 +3,10 @@ package com.reckue.account.service;
 import com.reckue.account.exception.AccessDeniedException;
 import com.reckue.account.exception.AlreadyExistsException;
 import com.reckue.account.exception.NotFoundException;
+import com.reckue.account.model.Account;
 import com.reckue.account.model.Role;
 import com.reckue.account.model.Status;
-import com.reckue.account.model.User;
-import com.reckue.account.repository.UserRepository;
+import com.reckue.account.repository.AccountRepository;
 import com.reckue.account.util.helper.RandomHelper;
 import com.reckue.account.util.helper.TimestampHelper;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +25,7 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * Class UserService represents service with operations related to the user and the database.
+ * Class AccountService represents service with operations related to the account and the database.
  *
  * @author Kamila Meshcheryakova
  */
@@ -34,9 +34,9 @@ import java.util.Optional;
 @Transactional
 @RequiredArgsConstructor
 @SuppressWarnings("unused")
-public class UserService {
+public class AccountService {
 
-    private final UserRepository userRepository;
+    private final AccountRepository accountRepository;
     private final PasswordEncoder passwordEncoder;
     private final TokenStore tokenStore;
 
@@ -47,71 +47,71 @@ public class UserService {
      * @param offset quantity to skip
      * @param sort   parameter for sorting
      * @param desc   sorting descending or ascending
-     * @return list of given quantity of objects of class UserTransfer with a given offset
+     * @return list of given quantity of objects of class Account with a given offset
      * sorted by the selected parameter for sorting in descending or ascending order
      */
-    public List<User> findAll(int limit, int offset, String sort, boolean desc) {
+    public List<Account> findAll(int limit, int offset, String sort, boolean desc) {
         Sort sorted = desc ? Sort.by(sort).descending() : Sort.by(sort).ascending();
-        return userRepository.findAll(PageRequest.of(offset, limit, sorted)).getContent();
+        return accountRepository.findAll(PageRequest.of(offset, limit, sorted)).getContent();
     }
 
     /**
-     * This method is used to find the user by id in the database.
-     * Throws {@link NotFoundException} in case if such user isn't contained in database.
+     * This method is used to find the account by id in the database.
+     * Throws {@link NotFoundException} in case if such account isn't contained in database.
      *
      * @param id the object identifier
-     * @return the object of class User
+     * @return the object of class Account
      */
-    public User findById(String id) {
-        return userRepository.findById(id).orElseThrow(
-                () -> new NotFoundException("The user by id '" + id + "' not found", HttpStatus.NOT_FOUND));
+    public Account findById(String id) {
+        return accountRepository.findById(id).orElseThrow(
+                () -> new NotFoundException("The account by id '" + id + "' not found", HttpStatus.NOT_FOUND));
     }
 
     /**
-     * This method is used to create an object of class User.
-     * Throws {@link AlreadyExistsException} in case if user with such username or email already exists.
+     * This method is used to create an object of class Account.
+     * Throws {@link AlreadyExistsException} in case if account with such username or email already exists.
      *
-     * @param userModel object of class User
-     * @return the object of class User
+     * @param accountModel object of class Account
+     * @return the object of class Account
      */
-    public User create(User userModel) {
-        if (!userRepository.existsByUsername(userModel.getUsername())
-                && !userRepository.existsByEmail(userModel.getEmail())) {
-            User user = User.builder()
-                    .id(RandomHelper.generate(userModel.getUsername()))
-                    .username(userModel.getUsername())
-                    .email(userModel.getEmail())
-                    .password(passwordEncoder.encode(userModel.getPassword()))
+    public Account create(Account accountModel) {
+        if (!accountRepository.existsByUsername(accountModel.getUsername())
+                && !accountRepository.existsByEmail(accountModel.getEmail())) {
+            Account account = Account.builder()
+                    .id(RandomHelper.generate(accountModel.getUsername()))
+                    .username(accountModel.getUsername())
+                    .email(accountModel.getEmail())
+                    .password(passwordEncoder.encode(accountModel.getPassword()))
                     .roles(new HashSet<>())
                     .status(Status.ACTIVE)
                     .created(TimestampHelper.getCurrentTimestamp())
                     .updated(TimestampHelper.getCurrentTimestamp())
                     .build();
-            user.getRoles().add(new Role("ROLE_USER"));
-            return userRepository.save(user);
+            account.getRoles().add(new Role("ROLE_USER"));
+            return accountRepository.save(account);
         } else {
             throw new AlreadyExistsException("Username or Email already exists", HttpStatus.NOT_MODIFIED);
         }
     }
 
     /**
-     * This method is user to delete the user by name.
-     * Throws {@link NotFoundException} in case if such user isn't contained in database.
+     * This method is used to delete the account by username.
+     * Throws {@link NotFoundException} in case if such account isn't contained in database.
      * Throws {@link AccessDeniedException} in case if the user isn't the same user or
      * hasn't admin authorities.
      *
      * @param username the object name
      */
     public void deleteByUsername(String username, String token) {
-        if (!userRepository.existsByUsername(username)) {
-            throw new NotFoundException("The user by username '" + username + "' not found", HttpStatus.NOT_FOUND);
+        if (!accountRepository.existsByUsername(username)) {
+            throw new NotFoundException("The account by username '" + username + "' not found", HttpStatus.NOT_FOUND);
         }
         Map<String, Object> tokenInfo = tokenStore.readAccessToken(token).getAdditionalInformation();
-        Optional<User> user = userRepository.findByUsername(username);
-        if (user.isPresent()) {
-            String userId = user.get().getId();
+        Optional<Account> account = accountRepository.findByUsername(username);
+        if (account.isPresent()) {
+            String userId = account.get().getId();
             if (tokenInfo.get("userId").equals(userId) || tokenInfo.get("authorities").equals("ROLE_ADMIN")) {
-                userRepository.deleteByUsername(username);
+                accountRepository.deleteByUsername(username);
             } else {
                 throw new AccessDeniedException("The operation forbidden", HttpStatus.FORBIDDEN);
             }
@@ -119,23 +119,23 @@ public class UserService {
     }
 
     /**
-     * This method is user to delete the user by id.
-     * Throws {@link NotFoundException} in case if such user isn't contained in database.
+     * This method is used to delete the account by id.
+     * Throws {@link NotFoundException} in case if such account isn't contained in database.
      * Throws {@link AccessDeniedException} in case if the user isn't the same user or
      * hasn't admin authorities.
      *
      * @param id the object identifier
      */
     public void deleteById(String id, String token) {
-        if (!userRepository.existsById(id)) {
-            throw new NotFoundException("The user by id '" + id + "' not found", HttpStatus.NOT_FOUND);
+        if (!accountRepository.existsById(id)) {
+            throw new NotFoundException("The account by id '" + id + "' not found", HttpStatus.NOT_FOUND);
         }
         Map<String, Object> tokenInfo = tokenStore.readAccessToken(token).getAdditionalInformation();
-        Optional<User> user = userRepository.findById(id);
-        if (user.isPresent()) {
-            String userId = user.get().getId();
+        Optional<Account> account = accountRepository.findById(id);
+        if (account.isPresent()) {
+            String userId = account.get().getId();
             if (tokenInfo.get("userId").equals(userId) || tokenInfo.get("authorities").equals("ROLE_ADMIN")) {
-                userRepository.deleteById(id);
+                accountRepository.deleteById(id);
             } else {
                 throw new AccessDeniedException("The operation forbidden", HttpStatus.FORBIDDEN);
             }
@@ -143,15 +143,15 @@ public class UserService {
     }
 
     /**
-     * This method is used to find the user by name in the database.
-     * Throws {@link NotFoundException} in case if such user isn't contained in database.
+     * This method is used to find the account by username in the database.
+     * Throws {@link NotFoundException} in case if such account isn't contained in database.
      *
      * @param username the object name
      * @return the object of class User
      */
-    public User findByUsername(String username) {
-        return userRepository.findByUsername(username)
-                .orElseThrow(() -> new NotFoundException("The user by username '" + username + "' not found",
+    public Account findByUsername(String username) {
+        return accountRepository.findByUsername(username)
+                .orElseThrow(() -> new NotFoundException("The account by username '" + username + "' not found",
                         HttpStatus.NOT_FOUND));
     }
 }

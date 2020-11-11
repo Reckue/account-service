@@ -1,0 +1,12 @@
+databaseChangeLog:
+  - changeSet:
+      id: rename-table-users
+      author: camelya
+      preConditions:
+        - onFail: MARK_RAN
+      changes:
+        - renameTable:
+            catalogName:  account-develop
+            newTableName:  accounts
+            oldTableName:  users
+            schemaName:  public

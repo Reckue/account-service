@@ -1,7 +1,7 @@
 package com.reckue.account.model;
 
 /**
- * Enum Status provides an enumeration of statuses for identifying user state.
+ * Enum Status provides an enumeration of statuses for identifying account state.
  *
  * @author Kamila Meshcheryakova
  */
