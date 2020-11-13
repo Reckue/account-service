@@ -30,7 +30,7 @@ public class Role implements GrantedAuthority {
     }
 
     /**
-     * This method allows the user to obtain authentication.
+     * This method allows the account to obtain authentication.
      *
      * @return name of role
      */

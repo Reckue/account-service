@@ -5,3 +5,7 @@ databaseChangeLog:
       file: migrations/0002-create-roles.yaml
   - include:
       file: migrations/0003-create-role-users.yaml
+  - include:
+      file: migrations/0004-change-users-to-accounts.yaml
+  - include:
+      file: migrations/0005-change-to-role-accounts.yaml

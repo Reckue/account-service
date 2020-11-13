@@ -1,6 +1,6 @@
 package com.reckue.account.config;
 
-import com.reckue.account.model.User;
+import com.reckue.account.model.Account;
 import org.springframework.security.oauth2.common.DefaultOAuth2AccessToken;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
@@ -19,18 +19,18 @@ public class CustomTokenEnhancer extends JwtAccessTokenConverter {
     /**
      * This method allows to add additional information to token.
      *
-     * @param accessToken JWT
+     * @param accessToken    JWT
      * @param authentication OAuth2Authentication
      * @return the object of OAuth2AccessToken class with changes
      */
     @Override
     public OAuth2AccessToken enhance(OAuth2AccessToken accessToken, OAuth2Authentication authentication) {
-        User user = (User) authentication.getPrincipal();
+        Account account = (Account) authentication.getPrincipal();
 
         Map<String, Object> info = new LinkedHashMap<>(accessToken.getAdditionalInformation());
-        info.put("userId", user.getId());
-        info.put("email", user.getEmail());
-        info.put("username", user.getUsername());
+        info.put("userId", account.getId());
+        info.put("email", account.getEmail());
+        info.put("username", account.getUsername());
 
         DefaultOAuth2AccessToken customAccessToken = new DefaultOAuth2AccessToken(accessToken);
         customAccessToken.setAdditionalInformation(info);

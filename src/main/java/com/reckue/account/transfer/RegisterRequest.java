@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 import javax.validation.constraints.NotNull;
 
 /**
- * Class RegisterRequest represents an incoming DTO for a user to register.
+ * Class RegisterRequest represents an incoming DTO for an account to register.
  *
  * @author Kamila Meshcheryakova
  */
@@ -18,14 +18,14 @@ import javax.validation.constraints.NotNull;
 @SuppressWarnings("unused")
 public class RegisterRequest {
     @NotNull
-    @ApiModelProperty(notes = "The user name")
+    @ApiModelProperty(notes = "The account username")
     private String username;
 
     @NotNull
-    @ApiModelProperty(notes = "The user email, for example: email@mail.ru")
+    @ApiModelProperty(notes = "The account email, for example: email@mail.ru")
     private String email;
 
     @NotNull
-    @ApiModelProperty(notes = "The user password, for example: Passw0rd")
+    @ApiModelProperty(notes = "The account password, for example: Passw0rd")
     private String password;
 }

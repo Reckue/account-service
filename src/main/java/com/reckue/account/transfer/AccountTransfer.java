@@ -5,12 +5,12 @@ import lombok.Data;
 import java.util.Set;
 
 /**
- * Class UserTransfer represents an outgoing DTO to receive an authorised user.
+ * Class AccountTransfer represents an outgoing DTO to receive an authorised user.
  *
  * @author Kamila Meshcheryakova
  */
 @Data
-public class UserTransfer {
+public class AccountTransfer {
 
     private String id;
     private String username;

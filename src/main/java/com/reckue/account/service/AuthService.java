@@ -3,10 +3,10 @@ package com.reckue.account.service;
 import com.reckue.account.exception.AuthenticationException;
 import com.reckue.account.exception.InvalidDataException;
 import com.reckue.account.exception.NotFoundException;
+import com.reckue.account.model.Account;
 import com.reckue.account.model.Role;
 import com.reckue.account.model.Status;
-import com.reckue.account.model.User;
-import com.reckue.account.repository.UserRepository;
+import com.reckue.account.repository.AccountRepository;
 import com.reckue.account.transfer.RegisterRequest;
 import com.reckue.account.util.helper.RandomHelper;
 import com.reckue.account.util.helper.TimestampHelper;
@@ -35,18 +35,19 @@ import java.util.Objects;
 public class AuthService {
 
     private final TokenStore tokenStore;
-    private final UserRepository userRepository;
+    private final AccountRepository accountRepository;
     private final PasswordEncoder passwordEncoder;
 
     /**
-     * This method is used to register a new user.
+     * This method is used to register a new account.
      * Throws {@link AuthenticationException} in case if user with such username already exists.
      *
      * @param registerForm with required fields
      */
     public void register(RegisterRequest registerForm) {
-        // checking that the user exists in the database
-        if (!userRepository.existsByUsername(registerForm.getUsername())) {
+        // todo: send a mail about registration to user email
+        //checking that the account exists in the database
+        if (!accountRepository.existsByUsername(registerForm.getUsername())) {
 
             // check password verification
             if (!registerForm.getPassword().matches("(.*).{6,}")) {
@@ -59,8 +60,8 @@ public class AuthService {
                         HttpStatus.BAD_REQUEST);
             }
 
-            // create instance of user model and fill it
-            User user = User.builder()
+            // create instance of account model and fill it
+            Account account = Account.builder()
                     .id(RandomHelper.generate(registerForm.getUsername()))
                     .username(registerForm.getUsername())
                     .email(registerForm.getEmail())
@@ -72,11 +73,11 @@ public class AuthService {
                     .lastVisit(TimestampHelper.getCurrentTimestamp())
                     .build();
 
-            // add roles to instance of user model
-            user.getRoles().add(new Role("ROLE_USER"));
+            // add roles to instance of account model
+            account.getRoles().add(new Role("ROLE_USER"));
 
-            // save the user in database
-            userRepository.save(user);
+            // save the account in database
+            accountRepository.save(account);
 
         } else {
             throw new AuthenticationException("Username already exists", HttpStatus.BAD_REQUEST);
@@ -84,9 +85,9 @@ public class AuthService {
     }
 
     /**
-     * This method is used to save refresh token of the user in database
+     * This method is used to save refresh token of the account in database
      * and in case of grandType "refresh_token" is used to check the validity of the refresh token.
-     * Throws {@link NotFoundException} in case if such user isn't contained in database.
+     * Throws {@link NotFoundException} in case if such account isn't contained in database.
      * Throws {@link AuthenticationException} in case if user enters invalid refresh token.
      *
      * @param responseEntity JWT
@@ -94,40 +95,40 @@ public class AuthService {
      */
     public void saveAndCheckRefreshToken(ResponseEntity<OAuth2AccessToken> responseEntity, String refreshToken) {
         String userId = (String) Objects.requireNonNull(responseEntity.getBody()).getAdditionalInformation().get("userId");
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("The user by userId [" + userId + "] not found",
+        Account account = accountRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("The account by id [" + userId + "] not found",
                         HttpStatus.NOT_FOUND));
-        if (!refreshToken.isEmpty() && !user.getRefreshToken().equals(refreshToken)) {
+        if (!refreshToken.isEmpty() && !account.getRefreshToken().equals(refreshToken)) {
             throw new AuthenticationException("Invalid refresh token", HttpStatus.UNAUTHORIZED);
         }
 
         // update last visit date
-        user.setLastVisit(TimestampHelper.getCurrentTimestamp());
-        user.setRefreshToken(responseEntity.getBody().getRefreshToken().toString());
+        account.setLastVisit(TimestampHelper.getCurrentTimestamp());
+        account.setRefreshToken(responseEntity.getBody().getRefreshToken().toString());
     }
 
     /**
-     * This method is used to get the user by his token.
-     * Throws {@link NotFoundException} in case if such user isn't contained in database.
+     * This method is used to get the account by user token.
+     * Throws {@link NotFoundException} in case if such account isn't contained in database.
      * Throws {@link AuthenticationException} in case of invalid token.
      *
      * @param token user token
-     * @return the object of class UserTransfer
+     * @return the object of class AccountTransfer
      */
-    public User getCurrentUser(String token) {
+    public Account getCurrentUser(String token) {
         // get userId from jwt token
         try {
             String userId = (String) tokenStore.readAccessToken(token).getAdditionalInformation().get("userId");
 
-            // find user by username from database
-            User user = userRepository.findById(userId)
-                    .orElseThrow(() -> new NotFoundException("The user by userId [" + userId + "] not found",
+            // find account by username from database
+            Account account = accountRepository.findById(userId)
+                    .orElseThrow(() -> new NotFoundException("The account by id [" + userId + "] not found",
                             HttpStatus.NOT_FOUND));
 
             // update last visit date
-            user.setLastVisit(TimestampHelper.getCurrentTimestamp());
+            account.setLastVisit(TimestampHelper.getCurrentTimestamp());
 
-            return user;
+            return account;
         } catch (Exception e) {
             throw new AuthenticationException("Invalid token", HttpStatus.UNAUTHORIZED);
         }
