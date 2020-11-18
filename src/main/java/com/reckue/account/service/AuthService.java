@@ -68,7 +68,6 @@ public class AuthService {
                     .password(passwordEncoder.encode(registerForm.getPassword()))
                     .roles(new HashSet<>())
                     .status(Status.ACTIVE)
-                    .refreshToken("none")
                     .created(TimestampHelper.getCurrentTimestamp())
                     .updated(TimestampHelper.getCurrentTimestamp())
                     .lastVisit(TimestampHelper.getCurrentTimestamp())
