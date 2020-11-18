@@ -5,11 +5,6 @@ databaseChangeLog:
       preConditions:
         - onFail: MARK_RAN
       changes:
-        - dropTable:
-            cascadeConstraints:  false
-            catalogName:  account-develop
-            schemaName:  public
-            tableName:  role_accounts
         - renameTable:
             catalogName:  account-develop
             newTableName:  role_accounts
