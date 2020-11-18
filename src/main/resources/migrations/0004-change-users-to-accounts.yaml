@@ -10,3 +10,15 @@ databaseChangeLog:
             newTableName:  accounts
             oldTableName:  users
             schemaName:  public
+        - renameTable:
+            catalogName:  account-develop
+            newTableName:  role_accounts
+            oldTableName:  role_users
+            schemaName:  public
+        - renameColumn:
+            catalogName:  account-develop
+            columnDataType:  varchar(255)
+            newColumnName:  accounts_id
+            oldColumnName:  users_id
+            schemaName:  public
+            tableName:  role_accounts

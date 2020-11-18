@@ -75,7 +75,7 @@ spring:
   # JPA config
   jpa:
     database: POSTGRESQL
-    hibernate.ddl-auto: update
+    hibernate.ddl-auto: none
     generate-ddl: true
 
 security:
@@ -87,4 +87,5 @@ security:
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka
+      defaultZone: http://127.0.0.1:8761/eureka
+    enabled: false

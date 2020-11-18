@@ -30,7 +30,6 @@ import java.util.Objects;
  */
 @Slf4j
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class AuthService {
 
@@ -44,6 +43,7 @@ public class AuthService {
      *
      * @param registerForm with required fields
      */
+    @Transactional
     public void register(RegisterRequest registerForm) {
         // todo: send a mail about registration to user email
         //checking that the account exists in the database
@@ -93,6 +93,7 @@ public class AuthService {
      * @param responseEntity JWT
      * @param refreshToken   "" or saved refresh token of the user
      */
+    @Transactional
     public void saveAndCheckRefreshToken(ResponseEntity<OAuth2AccessToken> responseEntity, String refreshToken) {
         String userId = (String) Objects.requireNonNull(responseEntity.getBody()).getAdditionalInformation().get("userId");
         Account account = accountRepository.findById(userId)

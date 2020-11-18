@@ -40,7 +40,7 @@ databaseChangeLog:
                   type: VARCHAR(255)
               - column:
                   constraints:
-                    nullable: false
+                    nullable: true
                   name: refresh_token
                   type: VARCHAR(255)
               - column:
