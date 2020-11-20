@@ -3,12 +3,12 @@ package com.reckue.account.controller;
 import com.reckue.account.controller.api.AuthApi;
 import com.reckue.account.exception.AuthenticationException;
 import com.reckue.account.service.AuthService;
+import com.reckue.account.service.SecurityService;
 import com.reckue.account.transfer.AccountTransfer;
 import com.reckue.account.transfer.RegisterRequest;
 import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import org.dozer.Mapper;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
@@ -20,8 +20,6 @@ import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
 import java.util.HashMap;
 import java.util.Map;
-
-import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 /**
  * Class AuthСontroller represents a REST-Controller with post and get operations connection with authentication.
@@ -37,6 +35,7 @@ public class AuthController implements AuthApi {
     private final Mapper mapper;
     private final AuthService authService;
     private final TokenEndpoint tokenEndpoint;
+    private final SecurityService securityService;
 
     /**
      * This type of request allows to register a new account.
@@ -45,9 +44,8 @@ public class AuthController implements AuthApi {
      * @return string
      */
     @PostMapping("/register")
-    public String register(@RequestBody RegisterRequest registerForm) {
-        authService.register(registerForm);
-        return "You have successfully registered";
+    public AccountTransfer register(@RequestBody RegisterRequest registerForm) {
+        return mapper.map(authService.register(registerForm), AccountTransfer.class);
     }
 
     /**
@@ -99,13 +97,7 @@ public class AuthController implements AuthApi {
     @GetMapping(value = "/current")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     public AccountTransfer getCurrentUser(HttpServletRequest request) {
-        try {
-            String token = request.getHeader(AUTHORIZATION).substring(7);
-            return mapper.map(authService.getCurrentUser(token), AccountTransfer.class);
-        } catch (NullPointerException e) {
-            throw new AuthenticationException("Token missing", HttpStatus.BAD_REQUEST);
-        } catch (StringIndexOutOfBoundsException e) {
-            throw new AuthenticationException("Token is too short", HttpStatus.BAD_REQUEST);
-        }
+        return mapper.map(authService.getCurrentUser(
+                (String) securityService.checkAndGetInfo(request).get("userId")), AccountTransfer.class);
     }
 }
