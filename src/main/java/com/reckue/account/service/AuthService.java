@@ -16,7 +16,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
-import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,7 +32,6 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class AuthService {
 
-    private final TokenStore tokenStore;
     private final AccountRepository accountRepository;
     private final PasswordEncoder passwordEncoder;
 
@@ -44,7 +42,7 @@ public class AuthService {
      * @param registerForm with required fields
      */
     @Transactional
-    public void register(RegisterRequest registerForm) {
+    public Account register(RegisterRequest registerForm) {
         // todo: send a mail about registration to user email
         //checking that the account exists in the database
         if (!accountRepository.existsByUsername(registerForm.getUsername())) {
@@ -77,7 +75,7 @@ public class AuthService {
             account.getRoles().add(new Role("ROLE_USER"));
 
             // save the account in database
-            accountRepository.save(account);
+            return accountRepository.save(account);
 
         } else {
             throw new AuthenticationException("Username already exists", HttpStatus.BAD_REQUEST);
@@ -111,28 +109,17 @@ public class AuthService {
     /**
      * This method is used to get the account by user token.
      * Throws {@link NotFoundException} in case if such account isn't contained in database.
-     * Throws {@link AuthenticationException} in case of invalid token.
      *
-     * @param token user token
+     * @param userId token user id
      * @return the object of class AccountTransfer
      */
-    public Account getCurrentUser(String token) {
-        // get userId from jwt token
-        try {
-            String userId = (String) tokenStore.readAccessToken(token).getAdditionalInformation().get("userId");
-
-            // find account by username from database
-            Account account = accountRepository.findById(userId)
-                    .orElseThrow(() -> new NotFoundException("The account by id [" + userId + "] not found",
-                            HttpStatus.NOT_FOUND));
-
-            // update last visit date
-            account.setLastVisit(TimestampHelper.getCurrentTimestamp());
-
-            return account;
-        } catch (Exception e) {
-            throw new AuthenticationException("Invalid token", HttpStatus.UNAUTHORIZED);
-        }
+    public Account getCurrentUser(String userId) {
+        Account account = accountRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("The account by id [" + userId + "] not found",
+                        HttpStatus.NOT_FOUND));
+        // update last visit date
+        account.setLastVisit(TimestampHelper.getCurrentTimestamp());
+        return account;
 
     }
 }

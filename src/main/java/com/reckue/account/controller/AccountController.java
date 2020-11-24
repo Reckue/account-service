@@ -3,18 +3,16 @@ package com.reckue.account.controller;
 import com.reckue.account.controller.api.AccountApi;
 import com.reckue.account.exception.AuthenticationException;
 import com.reckue.account.service.AccountService;
+import com.reckue.account.service.SecurityService;
 import com.reckue.account.transfer.AccountTransfer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dozer.Mapper;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 /**
  * Class AccountController represents a REST-Controller with get and delete operations connecting with users.
@@ -30,6 +28,7 @@ public class AccountController implements AccountApi {
 
     private final Mapper mapper;
     private final AccountService accountService;
+    private final SecurityService securityService;
 
     /**
      * This type of request allows to get all the users that meet the requirements.
@@ -80,16 +79,12 @@ public class AccountController implements AccountApi {
      * Throws {@link AuthenticationException} in case if token is absent.
      *
      * @param id the object identifier
+     * @param request information for HTTP servlets
      */
     @DeleteMapping("/delete/id/{id}")
     // @PreAuthorize("hasRole('ROLE_ADMIN')") doesn't work
     public void deleteById(@PathVariable String id, HttpServletRequest request) {
-        try {
-            String token = request.getHeader(AUTHORIZATION).substring(7);
-            accountService.deleteById(id, token);
-        } catch (NullPointerException e) {
-            throw new AuthenticationException("Token missing", HttpStatus.BAD_REQUEST);
-        }
+        accountService.deleteById(id, securityService.checkAndGetInfo(request));
     }
 
     /**
@@ -97,15 +92,11 @@ public class AccountController implements AccountApi {
      * Throws {@link AuthenticationException} in case if token is absent.
      *
      * @param username the object name
+     * @param request information for HTTP servlets
      */
     @DeleteMapping("/delete/username/{username}")
     //  @PreAuthorize("hasRole('ROLE_ADMIN')") doesn't work
     public void deleteByUsername(@PathVariable String username, HttpServletRequest request) {
-        try {
-            String token = request.getHeader(AUTHORIZATION).substring(7);
-            accountService.deleteByUsername(username, token);
-        } catch (NullPointerException e) {
-            throw new AuthenticationException("Token missing", HttpStatus.BAD_REQUEST);
-        }
+        accountService.deleteByUsername(username, securityService.checkAndGetInfo(request));
     }
 }

@@ -15,7 +15,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,7 +37,6 @@ public class AccountService {
 
     private final AccountRepository accountRepository;
     private final PasswordEncoder passwordEncoder;
-    private final TokenStore tokenStore;
 
     /**
      * This method is used to find all the users in the database that meet the requirements.
@@ -100,13 +98,13 @@ public class AccountService {
      * Throws {@link AccessDeniedException} in case if the user isn't the same user or
      * hasn't admin authorities.
      *
-     * @param username the object name
+     * @param username  the object name
+     * @param tokenInfo additional information from a token
      */
-    public void deleteByUsername(String username, String token) {
+    public void deleteByUsername(String username, Map<String, Object> tokenInfo) {
         if (!accountRepository.existsByUsername(username)) {
             throw new NotFoundException("The account by username '" + username + "' not found", HttpStatus.NOT_FOUND);
         }
-        Map<String, Object> tokenInfo = tokenStore.readAccessToken(token).getAdditionalInformation();
         Optional<Account> account = accountRepository.findByUsername(username);
         if (account.isPresent()) {
             String userId = account.get().getId();
@@ -124,13 +122,13 @@ public class AccountService {
      * Throws {@link AccessDeniedException} in case if the user isn't the same user or
      * hasn't admin authorities.
      *
-     * @param id the object identifier
+     * @param id        the object identifier
+     * @param tokenInfo additional information from a token
      */
-    public void deleteById(String id, String token) {
+    public void deleteById(String id, Map<String, Object> tokenInfo) {
         if (!accountRepository.existsById(id)) {
             throw new NotFoundException("The account by id '" + id + "' not found", HttpStatus.NOT_FOUND);
         }
-        Map<String, Object> tokenInfo = tokenStore.readAccessToken(token).getAdditionalInformation();
         Optional<Account> account = accountRepository.findById(id);
         if (account.isPresent()) {
             String userId = account.get().getId();
