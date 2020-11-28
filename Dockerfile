@@ -1,4 +1,3 @@
-FROM adoptopenjdk/openjdk11:alpine-jre
-ARG JAR_FILE=build/libs/*.jar
-COPY ${JAR_FILE} app.jar
+FROM openjdk:11-jre
+COPY build/libs/*.jar app.jar
 ENTRYPOINT ["java","-jar", "-Dspring.profiles.active=cloud","/app.jar"]

@@ -1,7 +1,8 @@
 version: '3.7'
 
 services:
-  postgres-account:
+  postgres:
+    container_name: postgres
     image: 'postgres:11.1'
     networks:
       - net
